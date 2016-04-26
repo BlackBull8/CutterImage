@@ -453,8 +453,8 @@ namespace CutterLogical
         private void MakePopUpElement()
         {
             PopupControl popupControl=new PopupControl();
-            popupControl.Width = 350;
-            popupControl.Height = 35;
+            popupControl.Width = 240;
+            popupControl.Height = 30;
             SetTop(popupControl, _selectedRegion.Bottom);
             SetLeft(popupControl, _selectedRegion.Right -popupControl.Width);
             Grid grid = MaskingCanvasOwner.Content as Grid;

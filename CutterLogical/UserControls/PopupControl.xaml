@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CutterLogical.UserControls"
              mc:Ignorable="d">
-    <Border BorderThickness="2" BorderBrush="Black" CornerRadius="2">
+    <Border BorderThickness="1" BorderBrush="Black" CornerRadius="2">
         <Border.Background>
             <SolidColorBrush>
                 <SolidColorBrush.Color>
@@ -13,7 +13,34 @@
                 </SolidColorBrush.Color>
             </SolidColorBrush>
         </Border.Background>
-        <Menu x:Name="MenuElement">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <ToggleButton Width="26" Height="21" Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                <ToggleButton.Content>
+                    <Rectangle Width="20" Height="15" Stroke="Black" StrokeThickness="2" Margin="1"></Rectangle>
+                </ToggleButton.Content>
+            </ToggleButton>
+            <ToggleButton Width="26" Height="21" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="Transparent">
+                <ToggleButton.Content>
+                    <Ellipse Stroke="Black" Width="20" Height="15" StrokeThickness="2" Margin="1"></Ellipse>
+                </ToggleButton.Content>
+            </ToggleButton>
+            <ToggleButton Grid.Column="2" Width="26" Height="21" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" Content="A" FontWeight="Bold" FontSize="13.5" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+            </ToggleButton>
+            <Button Width="26" Height="21" Grid.Column="3" x:Name="BtnCancel" Background="Transparent">
+                <Button.Content>
+                    <Image Source="../Images/Img_48.png" Stretch="Fill"></Image>
+                </Button.Content>
+            </Button>
+        </Grid>
+        <!--<Menu x:Name="MenuElement">
             <MenuItem Header="画矩形">
             </MenuItem>
             <MenuItem Header="画椭圆">
@@ -26,6 +53,6 @@
             </MenuItem>
             <MenuItem Header="完成">
             </MenuItem>
-        </Menu>
+        </Menu>-->
     </Border>
 </UserControl>
