@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using CutterLogical.EventArgsDefinition;
+using CutterLogical.UserControls;
 
 namespace CutterLogical
 {
@@ -440,10 +442,25 @@ namespace CutterLogical
                 var layer = AdornerLayer.GetAdornerLayer(this);
                 layer.Add(myCanvasAdorner);
                 //ClearSelectionData();
-
+                //todo:生成一个Popup窗体，里面是Menu
+                MakePopUpElement();
             }
         }
 
+        /// <summary>
+        /// 生成一个Popup元素
+        /// </summary>
+        private void MakePopUpElement()
+        {
+            PopupControl popupControl=new PopupControl();
+            popupControl.Width = 350;
+            popupControl.Height = 35;
+            SetTop(popupControl, _selectedRegion.Bottom);
+            SetLeft(popupControl, _selectedRegion.Right -popupControl.Width);
+            Grid grid = MaskingCanvasOwner.Content as Grid;
+            ((grid.Children[0]) as MaskingCanvas).Children.Add(popupControl);
+
+        }
 
 
         /// <summary>

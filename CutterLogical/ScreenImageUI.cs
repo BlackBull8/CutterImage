@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -50,7 +51,9 @@ namespace CutterLogical
 
             //设置完背景之后要把遮罩层弹出来
             _maskingCanvas = new MaskingCanvas() {MaskingCanvasOwner = this};
-            Content = _maskingCanvas;
+            Grid grid=new Grid();
+            grid.Children.Add(_maskingCanvas);
+            Content = grid;
         }
 
 
