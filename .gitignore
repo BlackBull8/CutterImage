@@ -20,9 +20,8 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
-.sln
-.suo
-.csproj
+*.sln
+*.csproj
 
 # Visual Studio 2015 cache/options directory
 .vs/
