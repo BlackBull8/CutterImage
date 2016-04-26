@@ -281,6 +281,7 @@ namespace CutterLogical
             //3.已经开始截图，鼠标邮件点击的落点是在选择框之内，则弹出菜单让用户选择操作
             if (_selectedRegion.IsEmpty)
             {
+                MaskingCanvasOwner.DialogResult = true;
                 MaskingCanvasOwner.Close();
             }
             else if (!_selectedRegion.IsEmpty && IsMouseOnThis(e))

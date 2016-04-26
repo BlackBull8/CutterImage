@@ -77,5 +77,7 @@ namespace CutterLogical
                 Close();
             }
         }
+
+        
     }
 }
