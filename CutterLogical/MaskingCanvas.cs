@@ -442,7 +442,6 @@ namespace CutterLogical
                 var layer = AdornerLayer.GetAdornerLayer(this);
                 layer.Add(myCanvasAdorner);
                 //ClearSelectionData();
-                //todo:生成一个Popup窗体，里面是Menu
                 MakePopUpElement();
             }
         }
@@ -453,7 +452,7 @@ namespace CutterLogical
         private void MakePopUpElement()
         {
             PopupControl popupControl=new PopupControl();
-            popupControl.Width = 240;
+            popupControl.Width = 190;
             popupControl.Height = 30;
             SetTop(popupControl, _selectedRegion.Bottom);
             SetLeft(popupControl, _selectedRegion.Right -popupControl.Width);

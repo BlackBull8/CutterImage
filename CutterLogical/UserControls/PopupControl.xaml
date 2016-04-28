@@ -22,21 +22,33 @@
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <ToggleButton Width="26" Height="21" Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+            <ToggleButton Width="26" Height="21" Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0">
                 <ToggleButton.Content>
                     <Rectangle Width="20" Height="15" Stroke="Black" StrokeThickness="2" Margin="1"></Rectangle>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Width="26" Height="21" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="Transparent">
+            <ToggleButton Width="26" Height="21" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0">
                 <ToggleButton.Content>
                     <Ellipse Stroke="Black" Width="20" Height="15" StrokeThickness="2" Margin="1"></Ellipse>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Grid.Column="2" Width="26" Height="21" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" Content="A" FontWeight="Bold" FontSize="13.5" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+            <ToggleButton Grid.Column="2" Width="26" Height="21" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" Content="A" FontWeight="Bold" FontSize="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0">
             </ToggleButton>
-            <Button Width="26" Height="21" Grid.Column="3" x:Name="BtnCancel" Background="Transparent">
+            <Button Width="26" Height="21" Grid.Column="3" x:Name="BtnSave" Background="Transparent" BorderThickness="0">
                 <Button.Content>
-                    <Image Source="../Images/Img_48.png" Stretch="Fill"></Image>
+                    <Image Source="../Images/Img_Save.png" Stretch="Fill"></Image>
+                </Button.Content>
+            </Button>
+
+            <Button Width="26" Height="21" Grid.Column="4" x:Name="BtnCancel" Background="Transparent" BorderThickness="0">
+                <Button.Content>
+                    <Image Source="../Images/Img_Cancel.png" Stretch="Fill"></Image>
+                </Button.Content>
+            </Button>
+
+            <Button Width="26" Height="21" Grid.Column="5" x:Name="BtnOk" Background="Transparent" BorderThickness="0">
+                <Button.Content>
+                    <Image Source="../Images/Img_Ok.png" Stretch="Fill"></Image>
                 </Button.Content>
             </Button>
         </Grid>
