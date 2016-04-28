@@ -24,5 +24,62 @@ namespace CutterLogical.UserControls
         {
             InitializeComponent();
         }
+
+        public event EventHandler<string> StartOperationEvent;
+        public event EventHandler<string> CancelOperationEvent;
+
+
+        private void DrawRectangleTb_Ckecked(object sender, RoutedEventArgs e)
+        {
+            DrawEllipseTbn.IsChecked = false;
+            DrawTextTbn.IsChecked = false;
+            StartOperation("Rectangle");
+        }
+
+        private void DrawRectangleTb_UnChecked(object sender, RoutedEventArgs e)
+        {
+            CancelOperation("Rectangle");
+        }
+
+        
+        private void DrawEllipseTb_Checked(object sender, RoutedEventArgs e)
+        {
+            DrawRectangleTbn.IsChecked = false;
+            DrawTextTbn.IsChecked = false;
+            StartOperation("Ellipse");
+        }
+
+        private void DrawEllipseTb_UnChecked(object sender, RoutedEventArgs e)
+        {
+           CancelOperation("Ellipse");
+        }
+
+        private void DrawText_Checked(object sender, RoutedEventArgs e)
+        {
+            DrawRectangleTbn.IsChecked = false;
+            DrawEllipseTbn.IsChecked = false;
+            StartOperation("Text");
+        }
+
+        private void DrawText_UnChecked(object sender, RoutedEventArgs e)
+        {
+            CancelOperation("Text");
+        }
+
+        private void StartOperation(string operation)
+        {
+            if (StartOperationEvent != null)
+            {
+                StartOperationEvent(this, operation);
+            }
+        }
+
+        private void CancelOperation(string operation)
+        {
+            if (CancelOperationEvent != null)
+            {
+                CancelOperationEvent(this, operation);
+            }
+        }
     }
 }

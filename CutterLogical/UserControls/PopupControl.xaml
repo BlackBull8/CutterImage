@@ -22,17 +22,17 @@
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <ToggleButton Width="26" Height="21" Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0">
+            <ToggleButton Width="26" Height="21" Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" Checked="DrawRectangleTb_Ckecked" Unchecked="DrawRectangleTb_UnChecked" x:Name="DrawRectangleTbn">
                 <ToggleButton.Content>
                     <Rectangle Width="20" Height="15" Stroke="Black" StrokeThickness="2" Margin="1"></Rectangle>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Width="26" Height="21" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0">
+            <ToggleButton Width="26" Height="21" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Checked="DrawEllipseTb_Checked" Unchecked="DrawEllipseTb_UnChecked" x:Name="DrawEllipseTbn">
                 <ToggleButton.Content>
                     <Ellipse Stroke="Black" Width="20" Height="15" StrokeThickness="2" Margin="1"></Ellipse>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Grid.Column="2" Width="26" Height="21" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" Content="A" FontWeight="Bold" FontSize="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0">
+            <ToggleButton Grid.Column="2" Width="26" Height="21" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" Content="A" FontWeight="Bold" FontSize="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" x:Name="DrawTextTbn" Checked="DrawText_Checked" Unchecked="DrawText_UnChecked">
             </ToggleButton>
             <Button Width="26" Height="21" Grid.Column="3" x:Name="BtnSave" Background="Transparent" BorderThickness="0">
                 <Button.Content>

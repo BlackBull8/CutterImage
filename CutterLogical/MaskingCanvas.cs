@@ -13,6 +13,7 @@ namespace CutterLogical
 {
     public class MaskingCanvas : Canvas
     {
+        #region 字段
         public ScreenImageUI MaskingCanvasOwner { get; set; }
         //private bool _isMaskDraging;
         //判断截图是否结束
@@ -31,7 +32,9 @@ namespace CutterLogical
         private Rect _selectedRegion = Rect.Empty;
         //private SelectedRegionElement _selectedRegion =new SelectedRegionElement();
 
-        
+        //操作窗体
+        private PopupControl _operationWindow;
+
         //遮罩层
         private readonly Rectangle _maskRectangleTop = new Rectangle();
         private readonly Rectangle _maskRectangleBottom = new Rectangle();
@@ -42,11 +45,18 @@ namespace CutterLogical
 
         private readonly Brush _maskRectangleBackground = new SolidColorBrush(Color.FromArgb(120, 255, 255, 255));
         private readonly Brush _selectingRectangleBackground = new SolidColorBrush(Color.FromArgb(255, 49, 106, 196));
+        #endregion
+
+
+        #region 构造函数
         public MaskingCanvas()
         {
             Loaded += MaskingCanvas_Loaded;
         }
+        #endregion
 
+
+        #region Loaded加载函数
         /// <summary>
         /// 画布加载事件
         /// </summary>
@@ -74,13 +84,59 @@ namespace CutterLogical
             Children.Add(_maskRectangleTop);
             Children.Add(_maskRectangleBottom);
 
-            
-            //Children.Add(_selectingRectangle);
-
             //一直执行刷新界面
             CompositionTarget.Rendering += CompositionTarget_Rendering;
+
+
+            //将生成的操作窗体放入到MaskingCanvas窗体中
+            if (_operationWindow == null)
+            {
+                _operationWindow = new PopupControl() {Width=190,Height=30};
+                _operationWindow.Visibility = Visibility.Collapsed;
+                _operationWindow.StartOperationEvent += _operationWindow_StartOperationEvent;
+                _operationWindow.CancelOperationEvent += _operationWindow_CancelOperationEvent;
+                Grid grid = MaskingCanvasOwner.Content as Grid;
+                ((grid.Children[0]) as MaskingCanvas).Children.Add(_operationWindow);
+            }
+           
         }
 
+        private void _operationWindow_StartOperationEvent(object sender, string operation)
+        {
+            if (operation == "Rectangle")
+            {
+                //todo:画矩形
+            }
+            else if (operation == "Ellipse")
+            {
+                //todo:画椭圆
+            }
+            else if (operation == "Text")
+            {
+                //todo:写文字
+            }
+        }
+
+        private void _operationWindow_CancelOperationEvent(object sender, string operation)
+        {
+            if (operation == "Rectangle")
+            {
+                //todo:取消画矩形
+            }
+            else if (operation == "Ellipse")
+            {
+                //todo:取消画椭圆
+            }
+            else if (operation == "Text")
+            {
+                //todo:取消写字
+            }
+        }
+
+        #endregion
+
+
+        #region 刷新界面函数
         /// <summary>
         /// 刷新界面
         /// </summary>
@@ -156,11 +212,12 @@ namespace CutterLogical
                 }
             }
         }
+        #endregion
 
 
         #region override事件
 
-
+        #region 鼠标左键按下事件
         /// <summary>
         /// 鼠标左键按下事件
         /// </summary>
@@ -172,7 +229,7 @@ namespace CutterLogical
             {
                 if (!this.Children.Contains(_selectingRectangle))
                 {
-                    _selectingRectangle=new Rectangle();
+                    _selectingRectangle = new Rectangle();
                     //选择框的Border颜色与厚度
                     _selectingRectangle.Stroke = _selectingRectangleBackground;
                     _selectingRectangle.StrokeThickness = 2.0;
@@ -180,6 +237,10 @@ namespace CutterLogical
                 }
                 StartToShowMask(e.GetPosition(this));
                 _catchStart = true;
+                if (_operationWindow.Visibility == Visibility.Visible)
+                {
+                    _operationWindow.Visibility = Visibility.Collapsed;
+                }
 
             }
             //如果点击在画布上面，就代表是移动
@@ -208,107 +269,12 @@ namespace CutterLogical
             base.OnMouseLeftButtonDown(e);
         }
 
-
-
-        /// <summary>
-        /// 鼠标移动事件
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            if (e.Source.Equals(this)&&_catchFinished)
-            {
-                Cursor =Cursors.Hand;
-            }
-            else if (IsMouseOnThis(e))
-            {
-                Cursor = Cursors.Arrow;
-            }
-            
-
-            if (e.Source.Equals(this) && _catchStart)
-            {
-                UpdateSelectedRegion(e);
-                e.Handled = true;
-            }
-            else if (e.Source.Equals(this) && _startMove)
-            {
-                //根据鼠标得到的_selectedStartPoint，并与鼠标移动的结果坐标进行计算，判断位移
-                MoveSelectedRegion(e);
-                e.Handled = true;
-            }
-            base.OnMouseMove(e);
-        }
-
-
-
-        /// <summary>
-        /// 鼠标左键弹起事件
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-        {
-            //如果是截图弹起
-            if (e.Source.Equals(this) && _catchStart)
-            {
-                _catchStart = false;
-                _catchFinished = true;
-                FinishShowMask();
-            }
-            //移动弹起
-            else if (e.Source.Equals(this) && _startMove)
-            {
-                if (IsMouseCaptured)
-                {
-                    ReleaseMouseCapture();
-                }
-                _startMove = false;
-                _endMove = true;
-                FinishMoveMask();
-
-            }
-            base.OnMouseLeftButtonUp(e);
-        }
-
-
-        /// <summary>
-        /// 鼠标右键弹起事件
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
-        {
-            //分成三种情况
-            //1.一种情况是没还没有开始截图，直接退出
-            //2.已经开始截图，鼠标右键点击的落点是在四个自定义的矩形上面，则表示把重新截图
-            //3.已经开始截图，鼠标邮件点击的落点是在选择框之内，则弹出菜单让用户选择操作
-            if (_selectedRegion.IsEmpty)
-            {
-                MaskingCanvasOwner.DialogResult = true;
-                MaskingCanvasOwner.Close();
-            }
-            else if (!_selectedRegion.IsEmpty && IsMouseOnThis(e))
-            {
-                _selectedRegion=Rect.Empty;               
-                Children.Remove(_selectingRectangle);
-                _selectingRectangle = null;
-                ClearSelectionData();
-            }
-            else if (!_selectedRegion.IsEmpty && e.Source.Equals(this))
-            {
-                //todo:右键菜单弹出
-                Console.WriteLine("弹出菜单");
-            }
-            base.OnMouseRightButtonUp(e);
-        }
-
-
         //判断鼠标是否点在定义的四个矩形上面
         private bool IsMouseOnThis(RoutedEventArgs e)
         {
             return e.Source.Equals(_maskRectangleLeft) || e.Source.Equals(_maskRectangleRight) ||
                    e.Source.Equals(_maskRectangleTop) || e.Source.Equals(_maskRectangleBottom);
         }
-
 
 
         /// <summary>
@@ -324,8 +290,39 @@ namespace CutterLogical
                 CaptureMouse();
             }
         }
+        #endregion
 
 
+        #region 鼠标移动事件
+        /// <summary>
+        /// 鼠标移动事件
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            if (e.Source.Equals(this) && _catchFinished)
+            {
+                Cursor = Cursors.Hand;
+            }
+            else if (IsMouseOnThis(e))
+            {
+                Cursor = Cursors.Arrow;
+            }
+
+
+            if (e.Source.Equals(this) && _catchStart)
+            {
+                UpdateSelectedRegion(e);
+                e.Handled = true;
+            }
+            else if (e.Source.Equals(this) && _startMove)
+            {
+                //根据鼠标得到的_selectedStartPoint，并与鼠标移动的结果坐标进行计算，判断位移
+                MoveSelectedRegion(e);
+                e.Handled = true;
+            }
+            base.OnMouseMove(e);
+        }
 
         /// <summary>
         /// 移动——更新选择区域
@@ -347,11 +344,12 @@ namespace CutterLogical
                 SetLeft(_selectingRectangle, x);
                 SetTop(_selectingRectangle, y);
                 _selectedStartPoint = _selectedEndPoint;
+                SetTop(_operationWindow, _selectedRegion.Bottom);
+                SetLeft(_operationWindow, _selectedRegion.Right - _operationWindow.Width);
+
             }
 
         }
-
-
 
         /// <summary>
         /// 刚开始拉伸——更新选择区域
@@ -402,27 +400,38 @@ namespace CutterLogical
             {
                 MessageBox.Show("_selectedStartPoint点为空");
             }
-
         }
+        #endregion
 
 
-
+        #region 鼠标左键弹起事件
         /// <summary>
-        /// 移动结束事件
+        /// 鼠标左键弹起事件
         /// </summary>
-        private void FinishMoveMask()
+        /// <param name="e"></param>
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            if (IsMouseCaptured)
+            //如果是截图弹起
+            if (e.Source.Equals(this) && _catchStart)
             {
-                ReleaseMouseCapture();
+                _catchStart = false;
+                _catchFinished = true;
+                FinishShowMask();
             }
-            if (_endMove)
+            //移动弹起
+            else if (e.Source.Equals(this) && _startMove)
             {
-                //ClearSelectionData();
+                if (IsMouseCaptured)
+                {
+                    ReleaseMouseCapture();
+                }
+                _startMove = false;
+                _endMove = true;
+                FinishMoveMask();
+
             }
+            base.OnMouseLeftButtonUp(e);
         }
-
-
 
         /// <summary>
         /// 选定区域结束事件
@@ -442,25 +451,61 @@ namespace CutterLogical
                 var layer = AdornerLayer.GetAdornerLayer(this);
                 layer.Add(myCanvasAdorner);
                 //ClearSelectionData();
-                MakePopUpElement();
+                //操作窗体的显示位置
+                _operationWindow.Visibility = Visibility.Visible;
+                SetTop(_operationWindow, _selectedRegion.Bottom);
+                SetLeft(_operationWindow, _selectedRegion.Right - _operationWindow.Width);
             }
         }
 
         /// <summary>
-        /// 生成一个Popup元素
+        /// 移动结束事件
         /// </summary>
-        private void MakePopUpElement()
+        private void FinishMoveMask()
         {
-            PopupControl popupControl=new PopupControl();
-            popupControl.Width = 190;
-            popupControl.Height = 30;
-            SetTop(popupControl, _selectedRegion.Bottom);
-            SetLeft(popupControl, _selectedRegion.Right -popupControl.Width);
-            Grid grid = MaskingCanvasOwner.Content as Grid;
-            ((grid.Children[0]) as MaskingCanvas).Children.Add(popupControl);
-
+            if (IsMouseCaptured)
+            {
+                ReleaseMouseCapture();
+            }
+            if (_endMove)
+            {
+                //ClearSelectionData();
+            }
         }
+        #endregion
 
+
+        #region 鼠标右键弹起事件
+        /// <summary>
+        /// 鼠标右键弹起事件
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+        {
+            //分成三种情况
+            //1.一种情况是没还没有开始截图，直接退出
+            //2.已经开始截图，鼠标右键点击的落点是在四个自定义的矩形上面，则表示把重新截图
+            //3.已经开始截图，鼠标邮件点击的落点是在选择框之内，则弹出菜单让用户选择操作
+            if (_selectedRegion.IsEmpty)
+            {
+                MaskingCanvasOwner.DialogResult = true;
+                MaskingCanvasOwner.Close();
+            }
+            else if (!_selectedRegion.IsEmpty && IsMouseOnThis(e))
+            {
+                _selectedRegion = Rect.Empty;
+                Children.Remove(_selectingRectangle);
+                _selectingRectangle = null;
+                ClearSelectionData();
+            }
+            else if (!_selectedRegion.IsEmpty && e.Source.Equals(this))
+            {
+                //todo:右键菜单弹出
+                Console.WriteLine("弹出菜单");
+            }
+            _operationWindow.Visibility = Visibility.Collapsed;
+            base.OnMouseRightButtonUp(e);
+        }
 
         /// <summary>
         /// 设置初始点为null
@@ -470,6 +515,7 @@ namespace CutterLogical
             _selectedStartPoint = null;
             _selectedEndPoint = null;
         }
+        #endregion
 
 
         #region MyCanvasAdorner事件（更新选择区域）
@@ -498,52 +544,9 @@ namespace CutterLogical
         }
         #endregion
 
-
         #endregion
-
-
     }
 
-    #region 无用代码
-    //private void UpdateSelectingRectangleLayout()
-    //{
-    //    if (_selectedRegion.Init)//!_selectedRegion.IsEmpty)
-    //    {
-    //        SetLeft(_selectingRectangle, _selectedRegion.Left);
-    //        SetTop(_selectingRectangle,_selectedRegion.Top);
-    //        _selectingRectangle.Width = _selectedRegion.Width;
-    //        _selectingRectangle.Height = _selectedRegion.Height;
-    //    }
-    //}
-
-
-    //internal class SelectedRegionElement : UIElement
-    //{
-    //    public double Left { get; set; }
-    //    public double Top { get; set; }
-    //    public double Width { get; set; }
-    //    public double Height { get; set; }
-
-    //    public double Right
-    //    {
-    //        get { return Left + Width; }
-    //    }
-
-    //    public double Bottom
-    //    {
-    //        get { return Top + Height; }
-    //    }
-
-    //    public bool Init { get; set; }
-
-    //    //protected override void OnRender(DrawingContext drawingContext)
-    //    //{
-    //    //    drawingContext.DrawRectangle(Brushes.Transparent, new System.Windows.Media.Pen(Brushes.Red, 2), new Rect(Left, Top, Width, Height));
-    //    //    base.OnRender(drawingContext);
-    //    //}
-
-    //}
-    #endregion
 
 
 }
