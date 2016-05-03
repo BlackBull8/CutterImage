@@ -45,6 +45,12 @@ namespace CutterLogical
 
         private readonly Brush _maskRectangleBackground = new SolidColorBrush(Color.FromArgb(120, 255, 255, 255));
         private readonly Brush _selectingRectangleBackground = new SolidColorBrush(Color.FromArgb(255, 49, 106, 196));
+
+        //添加红色选择框的标志
+        private string _operation = "";
+        private bool _isDraw;
+        private Rect _drawRect = Rect.Empty;
+        private Rectangle _drawRectangle;
         #endregion
 
 
@@ -91,46 +97,26 @@ namespace CutterLogical
             //将生成的操作窗体放入到MaskingCanvas窗体中
             if (_operationWindow == null)
             {
-                _operationWindow = new PopupControl() {Width=190,Height=30};
+                _operationWindow = new PopupControl() { Width = 190, Height = 30 };
                 _operationWindow.Visibility = Visibility.Collapsed;
                 _operationWindow.StartOperationEvent += _operationWindow_StartOperationEvent;
                 _operationWindow.CancelOperationEvent += _operationWindow_CancelOperationEvent;
                 Grid grid = MaskingCanvasOwner.Content as Grid;
                 ((grid.Children[0]) as MaskingCanvas).Children.Add(_operationWindow);
             }
-           
+
+
         }
 
         private void _operationWindow_StartOperationEvent(object sender, string operation)
         {
-            if (operation == "Rectangle")
-            {
-                //todo:画矩形
-            }
-            else if (operation == "Ellipse")
-            {
-                //todo:画椭圆
-            }
-            else if (operation == "Text")
-            {
-                //todo:写文字
-            }
+            _operation = operation;
         }
+
 
         private void _operationWindow_CancelOperationEvent(object sender, string operation)
         {
-            if (operation == "Rectangle")
-            {
-                //todo:取消画矩形
-            }
-            else if (operation == "Ellipse")
-            {
-                //todo:取消画椭圆
-            }
-            else if (operation == "Text")
-            {
-                //todo:取消写字
-            }
+            _operation = "None";
         }
 
         #endregion
@@ -257,8 +243,23 @@ namespace CutterLogical
                 }
                 else
                 {
+                    if (_operation == "")
+                    {
+                        _startMove = true;
+                    }
+                    else
+                    {
+                        _isDraw = true;
+                        if (_operation == "Rectangle")
+                        {
+                            _drawRectangle = new Rectangle();
+                            _drawRectangle.Stroke = new SolidColorBrush(Colors.Red);
+                            _drawRectangle.StrokeThickness = 2;
+                            _drawRectangle.Visibility = Visibility.Collapsed;
+                            Children.Add(_drawRectangle);
+                        }
+                    }
                     Console.WriteLine("点击了1次");
-                    _startMove = true;
                     _selectedStartPoint = e.GetPosition(this);
                     if (!IsMouseCaptured)
                     {
@@ -300,11 +301,15 @@ namespace CutterLogical
         /// <param name="e"></param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (e.Source.Equals(this) && _catchFinished)
+            if (e.Source.Equals(this) && _catchFinished && (_operation == ""|| _operation=="None"))
             {
                 Cursor = Cursors.Hand;
             }
-            else if (IsMouseOnThis(e))
+            else if (e.Source.Equals(this) && _catchFinished && _operation != "")
+            {
+                Cursor = Cursors.Cross;
+            }
+            else if (IsMouseOnThis(e) || e.Source.Equals(_operationWindow))
             {
                 Cursor = Cursors.Arrow;
             }
@@ -321,7 +326,61 @@ namespace CutterLogical
                 MoveSelectedRegion(e);
                 e.Handled = true;
             }
+            else if (e.Source.Equals(this) && _isDraw && _operation!="None")
+            {
+                DrawShape(e);
+                e.Handled = true;
+            }
             base.OnMouseMove(e);
+        }
+
+        private void DrawShape(MouseEventArgs e)
+        {
+
+            if (_selectedStartPoint.HasValue)
+            {
+                _selectedEndPoint = e.GetPosition(this);
+
+                Point startPoint = (Point)_selectedEndPoint;
+                Point endPoint = (Point)_selectedStartPoint;
+
+                double startX = startPoint.X;
+                double startY = startPoint.Y;
+                double endX = endPoint.X;
+                double endY = endPoint.Y;
+
+                double width = endX - startX;
+                double height = endY - startY;
+
+                if (Math.Abs(width) >= SystemParameters.MinimumHorizontalDragDistance ||
+                    Math.Abs(height) >= SystemParameters.MinimumVerticalDragDistance)
+                {
+                    //_isMaskDraging = true;
+
+                    double x = startX < endX ? startX : endX;
+                    double y = startY < endY ? startY : endY;
+                    double w = width < 0 ? -width : width;
+                    double h = height < 0 ? -height : height;
+                    _drawRect = new Rect(x, y, w, h);
+
+
+
+                    _drawRectangle.Width = w;
+                    _drawRectangle.Height = h;
+                    SetLeft(_drawRectangle, x);
+                    SetTop(_drawRectangle, y);
+                    _drawRectangle.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    //Console.WriteLine("距离太小。。。。。。");
+                    //todo:如果拖动的距离不被认定拖拽的话，就什么都不做。
+                }
+            }
+            else
+            {
+                MessageBox.Show("_selectedStartPoint点为空");
+            }
         }
 
         /// <summary>
@@ -389,6 +448,7 @@ namespace CutterLogical
                     _selectingRectangle.Height = h;
                     SetLeft(_selectingRectangle, x);
                     SetTop(_selectingRectangle, y);
+
                 }
                 else
                 {
@@ -429,6 +489,14 @@ namespace CutterLogical
                 _endMove = true;
                 FinishMoveMask();
 
+            }
+            else if (e.Source.Equals(this) && _isDraw)
+            {
+                if (IsMouseCaptured)
+                {
+                    ReleaseMouseCapture();
+                }
+                _isDraw = false;
             }
             base.OnMouseLeftButtonUp(e);
         }
@@ -546,7 +614,4 @@ namespace CutterLogical
 
         #endregion
     }
-
-
-
 }
