@@ -96,8 +96,17 @@ namespace CutterLogical
             //一直执行刷新界面
             CompositionTarget.Rendering += CompositionTarget_Rendering;
 
+            //将生成的操作窗体放入到MaskingCanvas窗体中
+            if (_operationWindow == null)
+            {
+                _operationWindow = new PopupControl() { Width = 190, Height = 30 };
+                _operationWindow.Visibility = Visibility.Collapsed;
+                _operationWindow.StartOperationEvent += _operationWindow_StartOperationEvent;
+                _operationWindow.CancelOperationEvent += _operationWindow_CancelOperationEvent;
+                Grid grid = MaskingCanvasOwner.Content as Grid;
+                ((grid.Children[0]) as MaskingCanvas).Children.Add(_operationWindow);
+            }
 
-           
 
 
         }
@@ -222,10 +231,11 @@ namespace CutterLogical
                     CaptureMouse();
                 }
                 _catchStart = true;
-                //if (_operationWindow.Visibility == Visibility.Visible)
-                //{
-                //    _operationWindow.Visibility = Visibility.Collapsed;
-                //}
+                if (_operationWindow.Visibility == Visibility.Visible)
+                {
+                    _operationWindow.Visibility = Visibility.Collapsed;
+                }
+
 
             }
             //如果点击在画布上面，就代表是移动
@@ -257,6 +267,10 @@ namespace CutterLogical
                             _drawRectangle.Visibility = Visibility.Collapsed;
                             Children.Add(_drawRectangle);
                             _listRectangles.Add(_drawRectangle);
+                        }
+                        else if (_operation == "Ellipse")
+                        {
+
                         }
                     }
                     Console.WriteLine("点击了1次");
@@ -503,18 +517,7 @@ namespace CutterLogical
                 myCanvasAdorner.VerticEventHandler += MyCanvasAdorner_VerticEventHandler;
                 var layer = AdornerLayer.GetAdornerLayer(this);
                 layer.Add(myCanvasAdorner);
-
-
-                //将生成的操作窗体放入到MaskingCanvas窗体中
-                if (_operationWindow == null)
-                {
-                    _operationWindow = new PopupControl() { Width = 190, Height = 30 };
-                    _operationWindow.Visibility = Visibility.Collapsed;
-                    _operationWindow.StartOperationEvent += _operationWindow_StartOperationEvent;
-                    _operationWindow.CancelOperationEvent += _operationWindow_CancelOperationEvent;
-                    Grid grid = MaskingCanvasOwner.Content as Grid;
-                    ((grid.Children[0]) as MaskingCanvas).Children.Add(_operationWindow);
-                }
+               
                 //操作窗体的显示位置
                 _operationWindow.Visibility = Visibility.Visible;
                 SetTop(_operationWindow, _selectedRegion.Bottom);
@@ -572,13 +575,13 @@ namespace CutterLogical
                 _catchFinished = false;
                 _selectedStartPoint = null;
                 _selectedEndPoint = null;
+                _operationWindow.Visibility = Visibility.Collapsed;
             }
             else if (!_selectedRegion.IsEmpty && e.Source.Equals(this))
             {
                 //todo:右键菜单弹出
                 Console.WriteLine("弹出菜单");
-            }
-            _operationWindow.Visibility = Visibility.Collapsed;
+            }           
             base.OnMouseRightButtonUp(e);
         }
         #endregion
@@ -595,7 +598,7 @@ namespace CutterLogical
             {
                 _selectedRegion = new Rect(_selectedRegion.X, _selectedRegion.Y + e.Dist, _selectedRegion.Width, _selectedRegion.Height - e.Dist);
             }
-            SetLeft(_drawRectangle, _selectedRegion.X);
+            SetTop(_operationWindow, _selectedRegion.Bottom);
             
         }
 
@@ -609,7 +612,7 @@ namespace CutterLogical
             {
                 _selectedRegion = new Rect(_selectedRegion.X + e.Dist, _selectedRegion.Y, _selectedRegion.Width - e.Dist, _selectedRegion.Height);
             }
-            SetTop(_drawRectangle, _selectedRegion.Y);
+            SetLeft(_operationWindow, _selectedRegion.Right-_operationWindow.ActualWidth);
         }
         #endregion
 
