@@ -50,10 +50,17 @@ namespace CutterLogical
         //添加红色选择框的标志
         private string _operation = "";
         private bool _isDraw;
+
+        //添加矩形所需要的字段
         private Rect _drawRect = Rect.Empty;
         private Rectangle _drawRectangle;
         private List<Rect> _listRects=new List<Rect>();
         private List<Rectangle> _listRectangles=new List<Rectangle>();
+
+        //添加椭圆所需要的字段
+        private Ellipse _drawEllipse;
+        private List<Rect> _listRectEllipses=new List<Rect>();
+        private List<Ellipse> _listEllipses = new List<Ellipse>();
         #endregion
 
 
@@ -264,13 +271,17 @@ namespace CutterLogical
                             _drawRectangle = new Rectangle();
                             _drawRectangle.Stroke = new SolidColorBrush(Colors.Red);
                             _drawRectangle.StrokeThickness = 2;
-                            _drawRectangle.Visibility = Visibility.Collapsed;
+                            //_drawRectangle.Visibility = Visibility.Collapsed;
                             Children.Add(_drawRectangle);
                             _listRectangles.Add(_drawRectangle);
                         }
                         else if (_operation == "Ellipse")
                         {
-
+                            _drawEllipse=new Ellipse();
+                            _drawEllipse.Stroke=new SolidColorBrush(Colors.Red);
+                            _drawEllipse.StrokeThickness = 2;
+                            Children.Add(_drawEllipse);
+                            _listEllipses.Add(_drawEllipse);
                         }
                     }
                     Console.WriteLine("点击了1次");
@@ -373,15 +384,27 @@ namespace CutterLogical
                     double y = startY < endY ? startY : endY;
                     double w = width < 0 ? -width : width;
                     double h = height < 0 ? -height : height;
-                    
                     _drawRect = new Rect(x, y, w, h);
-                    _listRects.Add(_drawRect);
+                    if (_operation == "Rectangle")
+                    {
+                       
+                        _listRects.Add(_drawRect);
 
-                    _drawRectangle.Width = w;
-                    _drawRectangle.Height = h;
-                    SetLeft(_drawRectangle, x);
-                    SetTop(_drawRectangle, y);
-                    _drawRectangle.Visibility = Visibility.Visible;
+                        _drawRectangle.Width = w;
+                        _drawRectangle.Height = h;
+                        SetLeft(_drawRectangle, x);
+                        SetTop(_drawRectangle, y);
+                        //_drawRectangle.Visibility = Visibility.Visible;
+                    }
+                    else if (_operation == "Ellipse")
+                    {
+                        //Console.WriteLine("开始画椭圆");
+                        _listRectEllipses.Add(_drawRect);
+                        _drawEllipse.Width = w;
+                        _drawEllipse.Height = h;
+                        SetLeft(_drawEllipse,x);
+                        SetTop(_drawEllipse,y);
+                    }
                 }
             }
             else
@@ -560,22 +583,7 @@ namespace CutterLogical
             }
             else if (!_selectedRegion.IsEmpty && IsMouseOnThis(e))
             {
-                _selectedRegion = Rect.Empty;
-                Children.Remove(_selectingRectangle);
-                _selectingRectangle = null;
-                foreach (Rectangle rectangle in _listRectangles)
-                {
-                    Children.Remove(rectangle);
-                }
-                _listRectangles.Clear();
-                _listRects.Clear();                
-                _operationWindow.DrawEllipseTbn.IsChecked =
-                    _operationWindow.DrawRectangleTbn.IsChecked = _operationWindow.DrawTextTbn.IsChecked = false;
-                _operation = "";
-                _catchFinished = false;
-                _selectedStartPoint = null;
-                _selectedEndPoint = null;
-                _operationWindow.Visibility = Visibility.Collapsed;
+                ClearCanvasData();
             }
             else if (!_selectedRegion.IsEmpty && e.Source.Equals(this))
             {
@@ -584,6 +592,34 @@ namespace CutterLogical
             }           
             base.OnMouseRightButtonUp(e);
         }
+
+        //删除画布上的所有元素
+        private void ClearCanvasData()
+        {
+            _selectedRegion = Rect.Empty;
+            Children.Remove(_selectingRectangle);
+            //_selectingRectangle = null;
+            foreach (Rectangle rectangle in _listRectangles)
+            {
+                Children.Remove(rectangle);
+            }
+            _listRectangles.Clear();
+            _listRects.Clear();
+            foreach (Ellipse ellipse in _listEllipses)
+            {
+                Children.Remove(ellipse);
+            }
+            _listEllipses.Clear();
+            _listRectEllipses.Clear();
+            _operationWindow.DrawEllipseTbn.IsChecked =
+                _operationWindow.DrawRectangleTbn.IsChecked = _operationWindow.DrawTextTbn.IsChecked = false;
+            _operation = "";
+            _catchFinished = false;
+            _selectedStartPoint = null;
+            _selectedEndPoint = null;
+            _operationWindow.Visibility = Visibility.Collapsed;
+        }
+
         #endregion
 
 
