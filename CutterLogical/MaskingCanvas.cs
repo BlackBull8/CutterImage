@@ -299,7 +299,6 @@ namespace CutterLogical
                         {
                             if (!flag)
                             {
-
                                 _drawTextBox = new TextBox();
                                 _drawTextBox.LostFocus += _drawTextBox_LostFocus;
                                 ResourceDictionary dictionary = new ResourceDictionary();
@@ -308,12 +307,9 @@ namespace CutterLogical
                                         UriKind.RelativeOrAbsolute);
                                 this.Resources.MergedDictionaries.Add(dictionary);
                                 _drawTextBox.MinWidth = 30 < _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1
-                                    ? 30
-                                    : _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
-                                _drawTextBox.MinHeight = 50 <
-                                                         _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1
-                                    ? 50
-                                    : _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
+                                    ? 30 : _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
+                                _drawTextBox.MinHeight = 50 < _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1
+                                    ? 50 : _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
                                 _drawTextBox.MaxWidth = _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
                                 _drawTextBox.MaxHeight = _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
                                 _drawTextBox.TextWrapping = TextWrapping.Wrap;
@@ -359,6 +355,7 @@ namespace CutterLogical
             {
                 _drawRect = new Rect(((Point) _selectedStartPoint).X, ((Point) _selectedStartPoint).Y,
                     textBox.ActualWidth, textBox.ActualHeight);
+                Console.WriteLine("起始地点："+ ((Point)_selectedStartPoint).X+">>>" + ((Point)_selectedStartPoint).Y);
                 RectToTextParameter rectToTextParameter = _textBoxAndTextDict[textBox];
                 rectToTextParameter.Rect = _drawRect;
                 rectToTextParameter.Text = textBox.Text;

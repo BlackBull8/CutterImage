@@ -8,9 +8,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CutterLogical.EventArgsDefinition;
 using Brush = System.Drawing.Brush;
+using Brushes = System.Windows.Media.Brushes;
 using Clipboard = System.Windows.Clipboard;
-using Color = System.Drawing.Color;
-using Pen = System.Drawing.Pen;
+using Pen = System.Windows.Media.Pen;
+using Point = System.Windows.Point;
+using SystemFonts = System.Windows.SystemFonts;
 
 namespace CutterLogical
 {
@@ -20,6 +22,7 @@ namespace CutterLogical
         private readonly MainCaptureScreen _mainCaptureScreenOwner;
         private Bitmap _screenSnapBitmap;
         private MaskingCanvas _maskingCanvas;
+        private BitmapSource bmpSource;
 
         public ScreenImageUI(MainCaptureScreen mainCaptureScreen)
         {
@@ -46,9 +49,10 @@ namespace CutterLogical
 
             //获取截屏的图片
             _screenSnapBitmap = HelperClass.GetScreenCutter();
+           
             if (_screenSnapBitmap != null)
             {
-                BitmapSource bmpSource = _screenSnapBitmap.BitmapToBitmapSource();
+                bmpSource = _screenSnapBitmap.BitmapToBitmapSource();
                 bmpSource.Freeze();
                 //设置背景
                 Background = new ImageBrush(bmpSource);
@@ -70,19 +74,45 @@ namespace CutterLogical
         {
             if (!selectedRegion.IsEmpty)
             {
-                //截图完毕，放到剪贴板当中
-                Bitmap catchedBmp = new Bitmap((int) selectedRegion.Width, (int) selectedRegion.Height);
-                Graphics g = Graphics.FromImage(catchedBmp);
-                Brush brush=new SolidBrush(Color.Red);
-                Pen pen=new Pen(brush, 2);               
-                foreach (Rect rect in listRectangleRects)
+                var rtbitmap = new RenderTargetBitmap(bmpSource.PixelWidth, bmpSource.PixelHeight, bmpSource.DpiX,
+                    bmpSource.DpiY, PixelFormats.Default);    
+                Pen pen=new Pen();
+                pen.Thickness = 2;
+                pen.Brush=new SolidColorBrush(Colors.Red);   
+                var drawingVisual=new DrawingVisual();
+                using (var dc = drawingVisual.RenderOpen())
                 {
-                    g.DrawRectangle(pen,new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height));
+                    dc.DrawImage(bmpSource, new Rect(0, 0, bmpSource.Width, bmpSource.Height));
+                    foreach (Rect rect in listRectangleRects)
+                    {
+                        dc.DrawRectangle(new SolidColorBrush(Colors.Transparent),pen,rect);
+                    }
+                    foreach (Rect ellipseTect in listEllipseTects)
+                    {                        
+                        dc.DrawEllipse(new SolidColorBrush(Colors.Transparent),pen,new Point((ellipseTect.Left+ellipseTect.Right)/2, (ellipseTect.Top + ellipseTect.Bottom) / 2),(ellipseTect.Right-ellipseTect.Left)/2,(ellipseTect.Bottom-ellipseTect.Top)/2);
+                    }
+                    foreach (RectToTextParameter rectToTextParameter in listTextRects)
+                    {
+                        var text=new FormattedText(rectToTextParameter.Text,System.Globalization.CultureInfo.CurrentUICulture,System.Windows.FlowDirection.LeftToRight,new Typeface(SystemFonts.MessageFontFamily,FontStyles.Normal,FontWeights.Normal,FontStretches.Normal),12,Brushes.Red );
+                        text.MaxTextHeight = rectToTextParameter.Rect.Height;
+                        text.MaxTextWidth = rectToTextParameter.Rect.Width;
+                        dc.DrawText(text,new Point(rectToTextParameter.Rect.X,rectToTextParameter.Rect.Y));
+                    }                  
                 }
-                g.DrawImage(_screenSnapBitmap,
+                rtbitmap.Render(drawingVisual);
+
+
+                //截图完毕，放到剪贴板当中
+                Bitmap catchedBmp = new Bitmap((int)selectedRegion.Width, (int)selectedRegion.Height);
+                Graphics g = Graphics.FromImage(catchedBmp);
+                g.DrawImage(rtbitmap.RenderTargetBitmapToBitmap(),
                     new System.Drawing.Rectangle(0, 0, (int) selectedRegion.Width, (int) selectedRegion.Height),
                     new System.Drawing.Rectangle((int) selectedRegion.X, (int) selectedRegion.Y,
                         (int) selectedRegion.Width, (int) selectedRegion.Height), GraphicsUnit.Pixel);
+
+
+
+
                 BitmapSource bs = catchedBmp.BitmapToBitmapSource();
                 Clipboard.SetImage(bs);
                 g.Dispose();
