@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using CutterLogical.EventArgsDefinition;
+using Brush = System.Drawing.Brush;
 using Clipboard = System.Windows.Clipboard;
+using Color = System.Drawing.Color;
+using Pen = System.Drawing.Pen;
 
 namespace CutterLogical
 {
@@ -61,13 +66,19 @@ namespace CutterLogical
         /// 进行截图操作
         /// </summary>
         /// <param name="selectedRegion"></param>
-        public void SnapshotClipToBoard(Rect selectedRegion)
+        public void SnapshotClipToBoard(Rect selectedRegion,List<Rect> listRectangleRects,List<Rect> listEllipseTects,List<RectToTextParameter> listTextRects)
         {
             if (!selectedRegion.IsEmpty)
             {
                 //截图完毕，放到剪贴板当中
                 Bitmap catchedBmp = new Bitmap((int) selectedRegion.Width, (int) selectedRegion.Height);
                 Graphics g = Graphics.FromImage(catchedBmp);
+                Brush brush=new SolidBrush(Color.Red);
+                Pen pen=new Pen(brush, 2);               
+                foreach (Rect rect in listRectangleRects)
+                {
+                    g.DrawRectangle(pen,new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height));
+                }
                 g.DrawImage(_screenSnapBitmap,
                     new System.Drawing.Rectangle(0, 0, (int) selectedRegion.Width, (int) selectedRegion.Height),
                     new System.Drawing.Rectangle((int) selectedRegion.X, (int) selectedRegion.Y,

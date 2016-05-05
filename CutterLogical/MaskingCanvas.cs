@@ -64,8 +64,10 @@ namespace CutterLogical
 
         //添加文字所需要的字段
         private TextBox _drawTextBox;
-        private List<Rect> _listRectTextBoxs=new List<Rect>();
-        private List<TextBox> _listTextBoxs=new List<TextBox>();
+        //private List<Rect> _listRectTextBoxs=new List<Rect>();
+        //private List<TextBox> _listTextBoxs=new List<TextBox>();
+        private bool flag;
+        private Dictionary<TextBox,RectToTextParameter> _textBoxAndTextDict=new Dictionary<TextBox, RectToTextParameter>();
         #endregion
 
 
@@ -118,14 +120,15 @@ namespace CutterLogical
                 Grid grid = MaskingCanvasOwner.Content as Grid;
                 ((grid.Children[0]) as MaskingCanvas).Children.Add(_operationWindow);
             }
-
-
-
         }
 
         private void _operationWindow_StartOperationEvent(object sender, string operation)
         {
             _operation = operation;
+            if (_operation == "Text")
+            {
+                flag = false;
+            }
         }
 
 
@@ -259,7 +262,12 @@ namespace CutterLogical
                     //todo:进行截图
                     if (MaskingCanvasOwner != null)
                     {
-                        MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion);
+                        List<RectToTextParameter> listTextRects=new List<RectToTextParameter>();
+                        foreach (RectToTextParameter rectToTextParameter in _textBoxAndTextDict.Values)
+                        {
+                            listTextRects.Add(rectToTextParameter);
+                        }
+                        MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion,_listRects,_listRectEllipses,listTextRects);
                     }
                 }
                 else
@@ -288,22 +296,44 @@ namespace CutterLogical
                             _listEllipses.Add(_drawEllipse);
                         }
                         else if (_operation == "Text")
-                        {                           
-                            _drawTextBox=new TextBox();
-                            _drawTextBox.LostFocus += _drawTextBox_LostFocus;
-                            ResourceDictionary dictionary=new ResourceDictionary();
-                            dictionary.Source=new Uri(@"pack://application:,,,/CutterLogical;component/Styles/TextBoxStyle.xaml", UriKind.RelativeOrAbsolute);
-                            this.Resources.MergedDictionaries.Add(dictionary);                           
-                            _drawTextBox.MinWidth = 30;
-                            _drawTextBox.MinHeight = 50;
-                            _drawTextBox.MaxWidth = _selectedRegion.Right - ((Point) _selectedStartPoint).X;
-                            _drawTextBox.MaxHeight = _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y-2;
-                            _drawTextBox.TextWrapping=TextWrapping.Wrap;
-                            SetLeft(_drawTextBox, ((Point)_selectedStartPoint).X);
-                            SetTop(_drawTextBox, ((Point)_selectedStartPoint).Y);
-                            Children.Add(_drawTextBox);
-                            _drawTextBox.Focus();
-                            _listTextBoxs.Add(_drawTextBox);
+                        {
+                            if (!flag)
+                            {
+
+                                _drawTextBox = new TextBox();
+                                _drawTextBox.LostFocus += _drawTextBox_LostFocus;
+                                ResourceDictionary dictionary = new ResourceDictionary();
+                                dictionary.Source =
+                                    new Uri(@"pack://application:,,,/CutterLogical;component/Styles/TextBoxStyle.xaml",
+                                        UriKind.RelativeOrAbsolute);
+                                this.Resources.MergedDictionaries.Add(dictionary);
+                                _drawTextBox.MinWidth = 30 < _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1
+                                    ? 30
+                                    : _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
+                                _drawTextBox.MinHeight = 50 <
+                                                         _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1
+                                    ? 50
+                                    : _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
+                                _drawTextBox.MaxWidth = _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
+                                _drawTextBox.MaxHeight = _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
+                                _drawTextBox.TextWrapping = TextWrapping.Wrap;
+                                SetLeft(_drawTextBox, ((Point) _selectedStartPoint).X);
+                                SetTop(_drawTextBox, ((Point) _selectedStartPoint).Y);
+                                Children.Add(_drawTextBox);
+                                _drawTextBox.Focus();
+
+                                RectToTextParameter rectToTextParameter = new RectToTextParameter();
+                                rectToTextParameter.Rect = new Rect(((Point) _selectedStartPoint).X,
+                                    ((Point) _selectedStartPoint).Y, _drawTextBox.ActualWidth, _drawTextBox.ActualHeight);
+                                rectToTextParameter.Text = _drawTextBox.Text;
+                                _textBoxAndTextDict[_drawTextBox] = rectToTextParameter;
+                                flag = true;
+                            }
+                            else if (flag)
+                            {
+                                _drawTextBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                                flag = false;
+                            }
                         }
                     }
                     Console.WriteLine("点击了1次");
@@ -324,11 +354,16 @@ namespace CutterLogical
         /// <param name="e"></param>
         private void _drawTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (_selectedStartPoint.HasValue)
+            TextBox textBox = sender as TextBox;
+            if (_selectedStartPoint.HasValue && textBox!=null)
             {
                 _drawRect = new Rect(((Point) _selectedStartPoint).X, ((Point) _selectedStartPoint).Y,
-                    ((TextBox) sender).ActualWidth, ((TextBox) sender).ActualHeight);
-                _listRectTextBoxs.Add(_drawRect);
+                    textBox.ActualWidth, textBox.ActualHeight);
+                RectToTextParameter rectToTextParameter = _textBoxAndTextDict[textBox];
+                rectToTextParameter.Rect = _drawRect;
+                rectToTextParameter.Text = textBox.Text;
+                _drawRect = Rect.Empty;
+                Console.WriteLine(_textBoxAndTextDict[textBox].Text);
             }
         }
 
@@ -373,7 +408,7 @@ namespace CutterLogical
                 MoveSelectedRegion(e);
                 e.Handled = true;
             }
-            else if (e.Source.Equals(this) && _isDraw && _operation!="None")
+            else if (e.Source.Equals(this) && _isDraw && _operation!="None"&&_operation!="Text")
             {
                 DrawShape(e);
                 e.Handled = true;
@@ -425,7 +460,7 @@ namespace CutterLogical
                     if (_operation == "Rectangle")
                     {
                        
-                        _listRects.Add(_drawRect);
+                        //_listRects.Add(_drawRect);
 
                         _drawRectangle.Width = w;
                         _drawRectangle.Height = h;
@@ -436,19 +471,11 @@ namespace CutterLogical
                     else if (_operation == "Ellipse")
                     {
                         //Console.WriteLine("开始画椭圆");
-                        _listRectEllipses.Add(_drawRect);
+                        //_listRectEllipses.Add(_drawRect);
                         _drawEllipse.Width = w;
                         _drawEllipse.Height = h;
                         SetLeft(_drawEllipse,x);
                         SetTop(_drawEllipse,y);
-                    }
-                    else if (_operation == "Text")
-                    {
-                        //_listRectTextBoxs.Add(_drawRect);
-                        ////_drawTextBox.Width = w;
-                        ////_drawTextBox.Height = h;
-                        //SetLeft(_drawTextBox,x);
-                        //SetTop(_drawTextBox,y);
                     }
                 }
             }
@@ -563,6 +590,22 @@ namespace CutterLogical
                 {
                     ReleaseMouseCapture();
                 }
+                if (_operation == "Rectangle")
+                {
+                    if (!_drawRect.IsEmpty)
+                    {
+                        _listRects.Add(_drawRect);
+                        _drawRect = Rect.Empty;
+                    }
+                }
+                else if (_operation == "Ellipse")
+                {
+                    if (!_drawRect.IsEmpty)
+                    {
+                        _listRectEllipses.Add(_drawRect);
+                        _drawRect = Rect.Empty;
+                    }
+                }
                 _isDraw = false;
             }
             base.OnMouseLeftButtonUp(e);
@@ -656,12 +699,14 @@ namespace CutterLogical
             }
             _listEllipses.Clear();
             _listRectEllipses.Clear();
-            foreach (TextBox textBox in _listTextBoxs)
+            foreach (TextBox textBox in _textBoxAndTextDict.Keys)
             {
                 Children.Remove(textBox);
             }
-            _listTextBoxs.Clear();
-            _listRectTextBoxs.Clear();
+
+            //_listTextBoxs.Clear();
+            //_listRectTextBoxs.Clear();
+            _textBoxAndTextDict.Clear();
             _operationWindow.DrawEllipseTbn.IsChecked =
                 _operationWindow.DrawRectangleTbn.IsChecked = _operationWindow.DrawTextTbn.IsChecked = false;
             _operation = "";

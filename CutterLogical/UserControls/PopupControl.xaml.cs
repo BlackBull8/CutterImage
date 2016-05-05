@@ -68,18 +68,27 @@ namespace CutterLogical.UserControls
 
         private void StartOperation(string operation)
         {
-            if (StartOperationEvent != null)
-            {
-                StartOperationEvent(this, operation);
-            }
+            StartOperationEvent?.Invoke(this, operation);
         }
 
         private void CancelOperation(string operation)
         {
-            if (CancelOperationEvent != null)
-            {
-                CancelOperationEvent(this, operation);
-            }
+            CancelOperationEvent?.Invoke(this, operation);
+        }
+
+        private void BtnSave_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnOk_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
