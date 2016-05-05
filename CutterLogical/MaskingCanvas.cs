@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Channels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -31,7 +32,6 @@ namespace CutterLogical
         private Point? _selectedEndPoint;
         //选择区域
         private Rect _selectedRegion = Rect.Empty;
-        //private SelectedRegionElement _selectedRegion =new SelectedRegionElement();
 
         //操作窗体
         private PopupControl _operationWindow;
@@ -61,6 +61,11 @@ namespace CutterLogical
         private Ellipse _drawEllipse;
         private List<Rect> _listRectEllipses=new List<Rect>();
         private List<Ellipse> _listEllipses = new List<Ellipse>();
+
+        //添加文字所需要的字段
+        private TextBox _drawTextBox;
+        private List<Rect> _listRectTextBoxs=new List<Rect>();
+        private List<TextBox> _listTextBoxs=new List<TextBox>();
         #endregion
 
 
@@ -220,6 +225,7 @@ namespace CutterLogical
         /// <param name="e"></param>
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
+            _selectedStartPoint = e.GetPosition(this);
             //判断鼠标是否点击在定义的四个矩形上面，如果符合，就把选择框弹出，把画布锁住，并得到初始点，最后设置截图开始
             if (IsMouseOnThis(e)&&_operation=="")
             {
@@ -231,8 +237,8 @@ namespace CutterLogical
                     _selectingRectangle.StrokeThickness = 2.0;
                     Children.Add(_selectingRectangle);
                 }
-                //StartToShowMask(e.GetPosition(this));
-                _selectedStartPoint = new Point?(e.GetPosition(this));
+                ////StartToShowMask(e.GetPosition(this));
+                //_selectedStartPoint = new Point?(e.GetPosition(this));
                 if (!IsMouseCaptured)
                 {
                     CaptureMouse();
@@ -242,7 +248,6 @@ namespace CutterLogical
                 {
                     _operationWindow.Visibility = Visibility.Collapsed;
                 }
-
 
             }
             //如果点击在画布上面，就代表是移动
@@ -271,7 +276,6 @@ namespace CutterLogical
                             _drawRectangle = new Rectangle();
                             _drawRectangle.Stroke = new SolidColorBrush(Colors.Red);
                             _drawRectangle.StrokeThickness = 2;
-                            //_drawRectangle.Visibility = Visibility.Collapsed;
                             Children.Add(_drawRectangle);
                             _listRectangles.Add(_drawRectangle);
                         }
@@ -283,9 +287,27 @@ namespace CutterLogical
                             Children.Add(_drawEllipse);
                             _listEllipses.Add(_drawEllipse);
                         }
+                        else if (_operation == "Text")
+                        {                           
+                            _drawTextBox=new TextBox();
+                            _drawTextBox.LostFocus += _drawTextBox_LostFocus;
+                            ResourceDictionary dictionary=new ResourceDictionary();
+                            dictionary.Source=new Uri(@"pack://application:,,,/CutterLogical;component/Styles/TextBoxStyle.xaml", UriKind.RelativeOrAbsolute);
+                            this.Resources.MergedDictionaries.Add(dictionary);                           
+                            _drawTextBox.MinWidth = 30;
+                            _drawTextBox.MinHeight = 50;
+                            _drawTextBox.MaxWidth = _selectedRegion.Right - ((Point) _selectedStartPoint).X;
+                            _drawTextBox.MaxHeight = _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y-2;
+                            _drawTextBox.TextWrapping=TextWrapping.Wrap;
+                            SetLeft(_drawTextBox, ((Point)_selectedStartPoint).X);
+                            SetTop(_drawTextBox, ((Point)_selectedStartPoint).Y);
+                            Children.Add(_drawTextBox);
+                            _drawTextBox.Focus();
+                            _listTextBoxs.Add(_drawTextBox);
+                        }
                     }
                     Console.WriteLine("点击了1次");
-                    _selectedStartPoint = e.GetPosition(this);
+                   
                     if (!IsMouseCaptured)
                     {
                         CaptureMouse();
@@ -293,6 +315,21 @@ namespace CutterLogical
                 }
             }
             base.OnMouseLeftButtonDown(e);
+        }
+
+        /// <summary>
+        /// 在文字输入框失去焦点时，记住文本框的位置，长度和宽度
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _drawTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStartPoint.HasValue)
+            {
+                _drawRect = new Rect(((Point) _selectedStartPoint).X, ((Point) _selectedStartPoint).Y,
+                    ((TextBox) sender).ActualWidth, ((TextBox) sender).ActualHeight);
+                _listRectTextBoxs.Add(_drawRect);
+            }
         }
 
         //判断鼠标是否点在定义的四个矩形上面
@@ -404,6 +441,14 @@ namespace CutterLogical
                         _drawEllipse.Height = h;
                         SetLeft(_drawEllipse,x);
                         SetTop(_drawEllipse,y);
+                    }
+                    else if (_operation == "Text")
+                    {
+                        //_listRectTextBoxs.Add(_drawRect);
+                        ////_drawTextBox.Width = w;
+                        ////_drawTextBox.Height = h;
+                        //SetLeft(_drawTextBox,x);
+                        //SetTop(_drawTextBox,y);
                     }
                 }
             }
@@ -611,6 +656,12 @@ namespace CutterLogical
             }
             _listEllipses.Clear();
             _listRectEllipses.Clear();
+            foreach (TextBox textBox in _listTextBoxs)
+            {
+                Children.Remove(textBox);
+            }
+            _listTextBoxs.Clear();
+            _listRectTextBoxs.Clear();
             _operationWindow.DrawEllipseTbn.IsChecked =
                 _operationWindow.DrawRectangleTbn.IsChecked = _operationWindow.DrawTextTbn.IsChecked = false;
             _operation = "";

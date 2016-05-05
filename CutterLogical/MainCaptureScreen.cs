@@ -10,8 +10,7 @@ namespace CutterLogical
             ScreenImageUI mainCutterUI =new ScreenImageUI(this);
             if (mainCutterUI.ShowDialog()==true)
             {
-                if (NotifyEventHanlder != null)
-                    NotifyEventHanlder(this, new EventArgs());
+                NotifyEventHanlder?.Invoke(this, new EventArgs());
             }
         }
     }
