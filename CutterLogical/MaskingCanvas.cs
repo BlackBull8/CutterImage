@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -354,7 +355,7 @@ namespace CutterLogical
                             else if (_flag)
                             {
                                 //移除焦点
-                                _drawTextBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                                _textBoxAndTextDict.Keys.Last().MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
                                 _flag = false;
                             }
                         }
@@ -377,11 +378,13 @@ namespace CutterLogical
         /// <param name="e"></param>
         private void _drawTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            var textBox = sender as TextBox;
-            if (_selectedStartPoint.HasValue && textBox != null)
-            {
-                _drawRect = _textBoxAndTextDict[textBox].Rect;
-            }
+            _flag = true;
+            //var textBox = sender as TextBox;
+            //_drawTextBox = textBox;
+            //if (_selectedStartPoint.HasValue && textBox != null)
+            //{
+            //    _drawRect = _textBoxAndTextDict[textBox].Rect;
+            //}
         }
 
         /// <summary>
@@ -391,16 +394,20 @@ namespace CutterLogical
         /// <param name="e"></param>
         private void _drawTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            var textBox = sender as TextBox;
-            
+            var textBox = sender as TextBox;          
             if (_selectedStartPoint.HasValue && textBox != null)
             {
                 if (textBox.Text.Trim() == "")
                 {
-                    _textBoxAndTextDict.Remove(textBox);
+                    if (_textBoxAndTextDict.ContainsKey(textBox))
+                    {
+                        _textBoxAndTextDict.Remove(textBox);
+                        Children.Remove(textBox);
+                    }
                 }
                 else
                 {
+                    _drawRect = _textBoxAndTextDict[textBox].Rect;
                     _drawRect.Width = textBox.ActualWidth;
                     _drawRect.Height = textBox.ActualHeight;
                     var rectToTextParameter = _textBoxAndTextDict[textBox];
