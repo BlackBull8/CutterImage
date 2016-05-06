@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,7 +6,6 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CutterLogical.EventArgsDefinition;
-using Brush = System.Drawing.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Clipboard = System.Windows.Clipboard;
 using Pen = System.Windows.Media.Pen;
@@ -26,7 +24,7 @@ namespace CutterLogical
 
         public ScreenImageUI(MainCaptureScreen mainCaptureScreen)
         {
-            this._mainCaptureScreenOwner = mainCaptureScreen;
+            _mainCaptureScreenOwner = mainCaptureScreen;
             Init();
         }
 
@@ -126,7 +124,7 @@ namespace CutterLogical
                 Clipboard.SetImage(bs);
                 g.Dispose();
                 catchedBmp.Dispose();
-                this.DialogResult = true;
+                DialogResult = true;
                 Close();
             }
         }

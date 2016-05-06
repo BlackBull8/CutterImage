@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -114,8 +113,7 @@ namespace CutterLogical
                         {
                             element.Width += e.HorizontalChange;
                             HorizontalAlignmentEventArgs arg = new HorizontalAlignmentEventArgs() { Dist = e.HorizontalChange, HorizontalType = HorizontalAlignment.Right };
-                            if (HoriEventHandler != null)
-                                HoriEventHandler(this, arg);
+                            HoriEventHandler?.Invoke(this, arg);
                         }
                         break;
                 }

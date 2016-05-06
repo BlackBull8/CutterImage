@@ -13,9 +13,19 @@ namespace CutterLogical
 {
     public class MaskingCanvas : Canvas
     {
+        #region 构造函数
+
+        public MaskingCanvas()
+        {
+            Loaded += MaskingCanvas_Loaded;
+        }
+
+        #endregion
+
         #region 字段
+
+        //画布宿主
         public ScreenImageUI MaskingCanvasOwner { get; set; }
-        //private bool _isMaskDraging;
         //判断截图是否结束
         private bool _catchFinished;
         //判断截图是否开始
@@ -52,32 +62,27 @@ namespace CutterLogical
         //添加矩形所需要的字段
         private Rect _drawRect = Rect.Empty;
         private Rectangle _drawRectangle;
-        private List<Rect> _listRects=new List<Rect>();
-        private List<Rectangle> _listRectangles=new List<Rectangle>();
+        private readonly List<Rect> _listRects = new List<Rect>();
+        private readonly List<Rectangle> _listRectangles = new List<Rectangle>();
 
         //添加椭圆所需要的字段
         private Ellipse _drawEllipse;
-        private List<Rect> _listRectEllipses=new List<Rect>();
-        private List<Ellipse> _listEllipses = new List<Ellipse>();
+        private readonly List<Rect> _listRectEllipses = new List<Rect>();
+        private readonly List<Ellipse> _listEllipses = new List<Ellipse>();
 
         //添加文字所需要的字段
         private TextBox _drawTextBox;
         private bool _flag;
-        private Dictionary<TextBox,RectToTextParameter> _textBoxAndTextDict=new Dictionary<TextBox, RectToTextParameter>();
+
+        private readonly Dictionary<TextBox, RectToTextParameter> _textBoxAndTextDict =
+            new Dictionary<TextBox, RectToTextParameter>();
+
         #endregion
-
-
-        #region 构造函数
-        public MaskingCanvas()
-        {
-            Loaded += MaskingCanvas_Loaded;
-        }
-        #endregion
-
 
         #region Loaded加载函数
+
         /// <summary>
-        /// 画布加载事件
+        ///     画布加载事件
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -109,17 +114,17 @@ namespace CutterLogical
             //将生成的操作窗体放入到MaskingCanvas窗体中
             if (_operationWindow == null)
             {
-                _operationWindow = new PopupControl{ Width = 190, Height = 30 };
+                _operationWindow = new PopupControl {Width = 190, Height = 30};
                 _operationWindow.Visibility = Visibility.Collapsed;
                 _operationWindow.StartOperationEvent += _operationWindow_StartOperationEvent;
                 _operationWindow.CancelOperationEvent += _operationWindow_CancelOperationEvent;
-                Grid grid = MaskingCanvasOwner.Content as Grid;
+                var grid = MaskingCanvasOwner.Content as Grid;
                 ((grid?.Children[0]) as MaskingCanvas)?.Children.Add(_operationWindow);
             }
         }
 
         /// <summary>
-        /// 指定操作窗体的操作类型
+        ///     指定操作窗体的操作类型
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="operation"></param>
@@ -133,7 +138,7 @@ namespace CutterLogical
         }
 
         /// <summary>
-        /// 取消操作窗体的操作类型
+        ///     取消操作窗体的操作类型
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="operation"></param>
@@ -144,10 +149,10 @@ namespace CutterLogical
 
         #endregion
 
-
         #region 刷新界面函数
+
         /// <summary>
-        /// 刷新界面
+        ///     刷新界面
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -160,12 +165,12 @@ namespace CutterLogical
         }
 
         /// <summary>
-        /// 更新整个界面的布局
+        ///     更新整个界面的布局
         /// </summary>
         private void UpdateMaskRectangleLayout()
         {
-            double actualHeight = ActualHeight;
-            double actualWidth = ActualWidth;
+            var actualHeight = ActualHeight;
+            var actualWidth = ActualWidth;
 
             //如果还没开始进行选择，就先把_maskRectangleLeft覆盖全屏幕
             if (_selectedRegion.IsEmpty)
@@ -183,7 +188,7 @@ namespace CutterLogical
             //如果已经有开始进行选择，对四个矩形进行位置设定
             else
             {
-                double temp = _selectedRegion.Left;
+                var temp = _selectedRegion.Left;
                 if (Math.Abs(_maskRectangleLeft.Width - temp) > 0.00001)
                 {
                     //以选择的区域为主，如果左边的遮罩矩形不等于选择框X轴的坐标时
@@ -218,21 +223,22 @@ namespace CutterLogical
                 }
             }
         }
-        #endregion
 
+        #endregion
 
         #region override事件
 
         #region 鼠标左键按下事件
+
         /// <summary>
-        /// 鼠标左键按下事件
+        ///     鼠标左键按下事件
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             _selectedStartPoint = e.GetPosition(this);
             //判断鼠标是否点击在定义的四个矩形上面，如果符合，就把选择框弹出，把画布锁住，并得到初始点，最后设置截图开始
-            if (IsMouseOnThis(e)&&_operation=="")
+            if (IsMouseOnThis(e) && _operation == "")
             {
                 if (!Children.Contains(_selectingRectangle))
                 {
@@ -251,7 +257,6 @@ namespace CutterLogical
                 {
                     _operationWindow.Visibility = Visibility.Collapsed;
                 }
-
             }
             //如果点击在画布上面，就代表是移动、双击截图由或者添加矩形，椭圆，文字等操作
             else if (e.Source.Equals(this))
@@ -262,20 +267,24 @@ namespace CutterLogical
                     //todo:进行截图
                     if (MaskingCanvasOwner != null)
                     {
-                        List<RectToTextParameter> listTextRects=new List<RectToTextParameter>();
-                        foreach (RectToTextParameter rectToTextParameter in _textBoxAndTextDict.Values)
+                        //将文字和显式位置作成参数进行传递
+                        var listTextRects = new List<RectToTextParameter>();
+                        foreach (var rectToTextParameter in _textBoxAndTextDict.Values)
                         {
                             listTextRects.Add(rectToTextParameter);
                         }
-                        MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion,_listRects,_listRectEllipses,listTextRects);
+                        MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
+                            listTextRects);
                     }
                 }
                 else
                 {
+                    //当_operation为空字符串时，才能进行移动，也就是说点击任何操作之后就不能移动了
                     if (_operation == "")
                     {
                         _startMove = true;
                     }
+                    //进行画矩形，画椭圆和写字的操作
                     else
                     {
                         _isDraw = true;
@@ -289,8 +298,8 @@ namespace CutterLogical
                         }
                         else if (_operation == "Ellipse")
                         {
-                            _drawEllipse=new Ellipse();
-                            _drawEllipse.Stroke=new SolidColorBrush(Colors.Red);
+                            _drawEllipse = new Ellipse();
+                            _drawEllipse.Stroke = new SolidColorBrush(Colors.Red);
                             _drawEllipse.StrokeThickness = 2;
                             Children.Add(_drawEllipse);
                             _listEllipses.Add(_drawEllipse);
@@ -299,17 +308,21 @@ namespace CutterLogical
                         {
                             if (!_flag)
                             {
+                                //添加输入文本框，并设置文本框的Style
                                 _drawTextBox = new TextBox();
                                 _drawTextBox.LostFocus += _drawTextBox_LostFocus;
-                                ResourceDictionary dictionary = new ResourceDictionary();
+                                var dictionary = new ResourceDictionary();
                                 dictionary.Source =
                                     new Uri(@"pack://application:,,,/CutterLogical;component/Styles/TextBoxStyle.xaml",
                                         UriKind.RelativeOrAbsolute);
                                 Resources.MergedDictionaries.Add(dictionary);
                                 _drawTextBox.MinWidth = 30 < _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1
-                                    ? 30 : _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
-                                _drawTextBox.MinHeight = 50 < _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1
-                                    ? 50 : _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
+                                    ? 30
+                                    : _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
+                                _drawTextBox.MinHeight = 50 <
+                                                         _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1
+                                    ? 50
+                                    : _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
                                 _drawTextBox.MaxWidth = _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
                                 _drawTextBox.MaxHeight = _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
                                 _drawTextBox.TextWrapping = TextWrapping.Wrap;
@@ -317,9 +330,9 @@ namespace CutterLogical
                                 SetTop(_drawTextBox, ((Point) _selectedStartPoint).Y);
                                 Children.Add(_drawTextBox);
                                 _drawTextBox.Focus();
-
-                                RectToTextParameter rectToTextParameter = new RectToTextParameter();
-                                 _drawRect= new Rect(((Point) _selectedStartPoint).X,
+                                //对文字和文字显式的位置进行记录
+                                var rectToTextParameter = new RectToTextParameter();
+                                _drawRect = new Rect(((Point) _selectedStartPoint).X,
                                     ((Point) _selectedStartPoint).Y, _drawTextBox.ActualWidth, _drawTextBox.ActualHeight);
                                 rectToTextParameter.Rect = _drawRect;
                                 rectToTextParameter.Text = _drawTextBox.Text;
@@ -328,13 +341,14 @@ namespace CutterLogical
                             }
                             else if (_flag)
                             {
+                                //移除焦点
                                 _drawTextBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
                                 _flag = false;
                             }
                         }
                     }
                     Console.WriteLine("点击了1次");
-                   
+
                     if (!IsMouseCaptured)
                     {
                         CaptureMouse();
@@ -345,23 +359,21 @@ namespace CutterLogical
         }
 
         /// <summary>
-        /// 在文字输入框失去焦点时，记住文本框的位置，长度和宽度
+        ///     在文字输入框失去焦点时，记住文本框的位置，长度和宽度
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _drawTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            TextBox textBox = sender as TextBox;
-            if (_selectedStartPoint.HasValue && textBox!=null)
+            var textBox = sender as TextBox;
+            if (_selectedStartPoint.HasValue && textBox != null)
             {
                 _drawRect.Width = textBox.ActualWidth;
                 _drawRect.Height = textBox.ActualHeight;
-                Console.WriteLine("起始地点："+ ((Point)_selectedStartPoint).X+">>>" + ((Point)_selectedStartPoint).Y);
-                RectToTextParameter rectToTextParameter = _textBoxAndTextDict[textBox];
+                var rectToTextParameter = _textBoxAndTextDict[textBox];
                 rectToTextParameter.Rect = _drawRect;
                 rectToTextParameter.Text = textBox.Text;
                 _drawRect = Rect.Empty;
-                Console.WriteLine(_textBoxAndTextDict[textBox].Text);
             }
         }
 
@@ -371,17 +383,19 @@ namespace CutterLogical
             return e.Source.Equals(_maskRectangleLeft) || e.Source.Equals(_maskRectangleRight) ||
                    e.Source.Equals(_maskRectangleTop) || e.Source.Equals(_maskRectangleBottom);
         }
+
         #endregion
 
-
         #region 鼠标移动事件
+
         /// <summary>
-        /// 鼠标移动事件
+        ///     鼠标移动事件
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (e.Source.Equals(this) && _catchFinished && (_operation == ""|| _operation=="None"))
+            //设置鼠标的样式
+            if (e.Source.Equals(this) && _catchFinished && (_operation == "" || _operation == "None"))
             {
                 Cursor = Cursors.Hand;
             }
@@ -394,19 +408,21 @@ namespace CutterLogical
                 Cursor = Cursors.Arrow;
             }
 
-
+            //进行截图的操作
             if (e.Source.Equals(this) && _catchStart)
             {
                 UpdateSelectedRegion(e);
                 e.Handled = true;
             }
+            //进行移动截图框的操作
             else if (e.Source.Equals(this) && _startMove)
             {
                 //根据鼠标得到的_selectedStartPoint，并与鼠标移动的结果坐标进行计算，判断位移
                 MoveSelectedRegion(e);
                 e.Handled = true;
             }
-            else if (e.Source.Equals(this) && _isDraw && _operation!="None"&&_operation!="Text")
+            //进行添加矩形、椭圆和文字的操作
+            else if (e.Source.Equals(this) && _isDraw && _operation != "None" && _operation != "Text")
             {
                 DrawShape(e);
                 e.Handled = true;
@@ -414,50 +430,53 @@ namespace CutterLogical
             base.OnMouseMove(e);
         }
 
+        /// <summary>
+        ///     添加矩形，椭圆和文字的操作
+        /// </summary>
+        /// <param name="e"></param>
         private void DrawShape(MouseEventArgs e)
         {
             if (_selectedStartPoint.HasValue)
             {
                 _selectedEndPoint = e.GetPosition(this);
-                Point startPoint = (Point)_selectedEndPoint;
+                var startPoint = (Point) _selectedEndPoint;
                 if (startPoint.X > _selectedRegion.X + _selectedRegion.Width)
                 {
-                    startPoint.X = _selectedRegion.X + _selectedRegion.Width-2;
+                    startPoint.X = _selectedRegion.X + _selectedRegion.Width - 2;
                 }
                 else if (startPoint.X < _selectedRegion.X)
                 {
-                    startPoint.X = _selectedRegion.X-2;
+                    startPoint.X = _selectedRegion.X - 2;
                 }
 
                 if (startPoint.Y > _selectedRegion.Y + _selectedRegion.Height)
                 {
-                    startPoint.Y = _selectedRegion.Y + _selectedRegion.Height-2;
+                    startPoint.Y = _selectedRegion.Y + _selectedRegion.Height - 2;
                 }
                 else if (startPoint.Y < _selectedRegion.Y)
                 {
-                    startPoint.Y = _selectedRegion.Y-2;
+                    startPoint.Y = _selectedRegion.Y - 2;
                 }
 
-                Point endPoint = (Point)_selectedStartPoint;
+                var endPoint = (Point) _selectedStartPoint;
 
-                double startX = startPoint.X;
-                double startY = startPoint.Y;
-                double endX = endPoint.X;
-                double endY = endPoint.Y;
-                double width = endX - startX;
-                double height = endY - startY;
+                var startX = startPoint.X;
+                var startY = startPoint.Y;
+                var endX = endPoint.X;
+                var endY = endPoint.Y;
+                var width = endX - startX;
+                var height = endY - startY;
 
                 if (Math.Abs(width) >= SystemParameters.MinimumHorizontalDragDistance ||
                     Math.Abs(height) >= SystemParameters.MinimumVerticalDragDistance)
                 {
-                    double x = startX < endX ? startX : endX;
-                    double y = startY < endY ? startY : endY;
-                    double w = width < 0 ? -width : width;
-                    double h = height < 0 ? -height : height;
+                    var x = startX < endX ? startX : endX;
+                    var y = startY < endY ? startY : endY;
+                    var w = width < 0 ? -width : width;
+                    var h = height < 0 ? -height : height;
                     _drawRect = new Rect(x, y, w, h);
                     if (_operation == "Rectangle")
                     {
-                       
                         //_listRects.Add(_drawRect);
 
                         _drawRectangle.Width = w;
@@ -472,8 +491,8 @@ namespace CutterLogical
                         //_listRectEllipses.Add(_drawRect);
                         _drawEllipse.Width = w;
                         _drawEllipse.Height = h;
-                        SetLeft(_drawEllipse,x);
-                        SetTop(_drawEllipse,y);
+                        SetLeft(_drawEllipse, x);
+                        SetTop(_drawEllipse, y);
                     }
                 }
             }
@@ -484,7 +503,7 @@ namespace CutterLogical
         }
 
         /// <summary>
-        /// 移动——更新选择区域
+        ///     移动——更新选择区域
         /// </summary>
         /// <param name="e"></param>
         private void MoveSelectedRegion(MouseEventArgs e)
@@ -492,26 +511,24 @@ namespace CutterLogical
             if (_selectedStartPoint.HasValue)
             {
                 _selectedEndPoint = e.GetPosition(this);
-                Point startPoint = (Point)_selectedStartPoint;
-                Point endPoint = (Point)_selectedEndPoint;
+                var startPoint = (Point) _selectedStartPoint;
+                var endPoint = (Point) _selectedEndPoint;
 
-                double disX = endPoint.X - startPoint.X;
-                double disY = endPoint.Y - startPoint.Y;
-                double x = _selectedRegion.Left + disX;
-                double y = _selectedRegion.Top + disY;
+                var disX = endPoint.X - startPoint.X;
+                var disY = endPoint.Y - startPoint.Y;
+                var x = _selectedRegion.Left + disX;
+                var y = _selectedRegion.Top + disY;
                 _selectedRegion = new Rect(x, y, _selectedRegion.Width, _selectedRegion.Height);
                 SetLeft(_selectingRectangle, x);
                 SetTop(_selectingRectangle, y);
                 _selectedStartPoint = _selectedEndPoint;
                 SetTop(_operationWindow, _selectedRegion.Bottom);
                 SetLeft(_operationWindow, _selectedRegion.Right - _operationWindow.Width);
-
             }
-
         }
 
         /// <summary>
-        /// 刚开始拉伸——更新选择区域
+        ///     刚开始拉伸——更新选择区域
         /// </summary>
         /// <param name="e"></param>
         private void UpdateSelectedRegion(MouseEventArgs e)
@@ -520,26 +537,26 @@ namespace CutterLogical
             {
                 _selectedEndPoint = e.GetPosition(this);
 
-                Point startPoint = (Point)_selectedEndPoint;
-                Point endPoint = (Point)_selectedStartPoint;
+                var startPoint = (Point) _selectedEndPoint;
+                var endPoint = (Point) _selectedStartPoint;
 
-                double startX = startPoint.X;
-                double startY = startPoint.Y;
-                double endX = endPoint.X;
-                double endY = endPoint.Y;
+                var startX = startPoint.X;
+                var startY = startPoint.Y;
+                var endX = endPoint.X;
+                var endY = endPoint.Y;
 
-                double width = endX - startX;
-                double height = endY - startY;
+                var width = endX - startX;
+                var height = endY - startY;
 
                 if (Math.Abs(width) >= SystemParameters.MinimumHorizontalDragDistance ||
                     Math.Abs(height) >= SystemParameters.MinimumVerticalDragDistance)
                 {
                     //_isMaskDraging = true;
 
-                    double x = startX < endX ? startX : endX;
-                    double y = startY < endY ? startY : endY;
-                    double w = width < 0 ? -width : width;
-                    double h = height < 0 ? -height : height;
+                    var x = startX < endX ? startX : endX;
+                    var y = startY < endY ? startY : endY;
+                    var w = width < 0 ? -width : width;
+                    var h = height < 0 ? -height : height;
                     _selectedRegion = new Rect(x, y, w, h);
 
                     _selectingRectangle.Width = w;
@@ -553,12 +570,13 @@ namespace CutterLogical
                 MessageBox.Show("_selectedStartPoint点为空");
             }
         }
+
         #endregion
 
-
         #region 鼠标左键弹起事件
+
         /// <summary>
-        /// 鼠标左键弹起事件
+        ///     鼠标左键弹起事件
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -580,8 +598,8 @@ namespace CutterLogical
                 _startMove = false;
                 _endMove = true;
                 FinishMoveMask();
-
             }
+            //添加矩形，椭圆或文字时的弹起
             else if (e.Source.Equals(this) && _isDraw)
             {
                 if (IsMouseCaptured)
@@ -610,7 +628,7 @@ namespace CutterLogical
         }
 
         /// <summary>
-        /// 选定区域结束事件
+        ///     选定区域结束事件
         /// </summary>
         private void FinishShowMask()
         {
@@ -621,12 +639,12 @@ namespace CutterLogical
             if (_catchFinished)
             {
                 //给选择框添加一个Adorner用来拉伸
-                MyCanvasAdorner myCanvasAdorner = new MyCanvasAdorner(_selectingRectangle);
+                var myCanvasAdorner = new MyCanvasAdorner(_selectingRectangle);
                 myCanvasAdorner.HoriEventHandler += MyCanvasAdorner_HoriEventHandler;
                 myCanvasAdorner.VerticEventHandler += MyCanvasAdorner_VerticEventHandler;
                 var layer = AdornerLayer.GetAdornerLayer(this);
                 layer.Add(myCanvasAdorner);
-               
+
                 //操作窗体的显示位置
                 _operationWindow.Visibility = Visibility.Visible;
                 if (!_selectedRegion.IsEmpty)
@@ -639,7 +657,7 @@ namespace CutterLogical
         }
 
         /// <summary>
-        /// 移动结束事件
+        ///     移动结束事件
         /// </summary>
         private void FinishMoveMask()
         {
@@ -652,12 +670,13 @@ namespace CutterLogical
                 //ClearSelectionData();
             }
         }
+
         #endregion
 
-
         #region 鼠标右键弹起事件
+
         /// <summary>
-        /// 鼠标右键弹起事件
+        ///     鼠标右键弹起事件
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
@@ -679,35 +698,34 @@ namespace CutterLogical
             {
                 //todo:右键菜单弹出
                 Console.WriteLine("弹出菜单");
-            }           
+            }
             base.OnMouseRightButtonUp(e);
         }
 
-        //删除画布上的所有元素
+        /// <summary>
+        ///     删除画布上的所有元素
+        /// </summary>
         private void ClearCanvasData()
         {
             _selectedRegion = Rect.Empty;
             Children.Remove(_selectingRectangle);
             //_selectingRectangle = null;
-            foreach (Rectangle rectangle in _listRectangles)
+            foreach (var rectangle in _listRectangles)
             {
                 Children.Remove(rectangle);
             }
             _listRectangles.Clear();
             _listRects.Clear();
-            foreach (Ellipse ellipse in _listEllipses)
+            foreach (var ellipse in _listEllipses)
             {
                 Children.Remove(ellipse);
             }
             _listEllipses.Clear();
             _listRectEllipses.Clear();
-            foreach (TextBox textBox in _textBoxAndTextDict.Keys)
+            foreach (var textBox in _textBoxAndTextDict.Keys)
             {
                 Children.Remove(textBox);
             }
-
-            //_listTextBoxs.Clear();
-            //_listRectTextBoxs.Clear();
             _textBoxAndTextDict.Clear();
             _operationWindow.DrawEllipseTbn.IsChecked =
                 _operationWindow.DrawRectangleTbn.IsChecked = _operationWindow.DrawTextTbn.IsChecked = false;
@@ -720,34 +738,38 @@ namespace CutterLogical
 
         #endregion
 
-
         #region MyCanvasAdorner事件（更新选择区域）
+
         private void MyCanvasAdorner_VerticEventHandler(object sender, VerticalAlignmentEventArgs e)
         {
             if (e.VerticalType == VerticalAlignment.Bottom)
             {
-                _selectedRegion = new Rect(_selectedRegion.X, _selectedRegion.Y, _selectedRegion.Width, _selectedRegion.Height + e.Dist);
+                _selectedRegion = new Rect(_selectedRegion.X, _selectedRegion.Y, _selectedRegion.Width,
+                    _selectedRegion.Height + e.Dist);
             }
             else if (e.VerticalType == VerticalAlignment.Top)
             {
-                _selectedRegion = new Rect(_selectedRegion.X, _selectedRegion.Y + e.Dist, _selectedRegion.Width, _selectedRegion.Height - e.Dist);
+                _selectedRegion = new Rect(_selectedRegion.X, _selectedRegion.Y + e.Dist, _selectedRegion.Width,
+                    _selectedRegion.Height - e.Dist);
             }
             SetTop(_operationWindow, _selectedRegion.Bottom);
-            
         }
 
         private void MyCanvasAdorner_HoriEventHandler(object sender, HorizontalAlignmentEventArgs e)
         {
             if (e.HorizontalType == HorizontalAlignment.Right)
             {
-                _selectedRegion = new Rect(_selectedRegion.X, _selectedRegion.Y, _selectedRegion.Width + e.Dist, _selectedRegion.Height);
+                _selectedRegion = new Rect(_selectedRegion.X, _selectedRegion.Y, _selectedRegion.Width + e.Dist,
+                    _selectedRegion.Height);
             }
             else if (e.HorizontalType == HorizontalAlignment.Left)
             {
-                _selectedRegion = new Rect(_selectedRegion.X + e.Dist, _selectedRegion.Y, _selectedRegion.Width - e.Dist, _selectedRegion.Height);
+                _selectedRegion = new Rect(_selectedRegion.X + e.Dist, _selectedRegion.Y, _selectedRegion.Width - e.Dist,
+                    _selectedRegion.Height);
             }
-            SetLeft(_operationWindow, _selectedRegion.Right-_operationWindow.ActualWidth);
+            SetLeft(_operationWindow, _selectedRegion.Right - _operationWindow.ActualWidth);
         }
+
         #endregion
 
         #endregion
