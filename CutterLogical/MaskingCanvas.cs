@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Channels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -64,9 +62,7 @@ namespace CutterLogical
 
         //添加文字所需要的字段
         private TextBox _drawTextBox;
-        //private List<Rect> _listRectTextBoxs=new List<Rect>();
-        //private List<TextBox> _listTextBoxs=new List<TextBox>();
-        private bool flag;
+        private bool _flag;
         private Dictionary<TextBox,RectToTextParameter> _textBoxAndTextDict=new Dictionary<TextBox, RectToTextParameter>();
         #endregion
 
@@ -113,25 +109,34 @@ namespace CutterLogical
             //将生成的操作窗体放入到MaskingCanvas窗体中
             if (_operationWindow == null)
             {
-                _operationWindow = new PopupControl() { Width = 190, Height = 30 };
+                _operationWindow = new PopupControl{ Width = 190, Height = 30 };
                 _operationWindow.Visibility = Visibility.Collapsed;
                 _operationWindow.StartOperationEvent += _operationWindow_StartOperationEvent;
                 _operationWindow.CancelOperationEvent += _operationWindow_CancelOperationEvent;
                 Grid grid = MaskingCanvasOwner.Content as Grid;
-                ((grid.Children[0]) as MaskingCanvas).Children.Add(_operationWindow);
+                ((grid?.Children[0]) as MaskingCanvas)?.Children.Add(_operationWindow);
             }
         }
 
+        /// <summary>
+        /// 指定操作窗体的操作类型
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="operation"></param>
         private void _operationWindow_StartOperationEvent(object sender, string operation)
         {
             _operation = operation;
             if (_operation == "Text")
             {
-                flag = false;
+                _flag = false;
             }
         }
 
-
+        /// <summary>
+        /// 取消操作窗体的操作类型
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="operation"></param>
         private void _operationWindow_CancelOperationEvent(object sender, string operation)
         {
             _operation = "None";
@@ -162,7 +167,6 @@ namespace CutterLogical
             double actualHeight = ActualHeight;
             double actualWidth = ActualWidth;
 
-
             //如果还没开始进行选择，就先把_maskRectangleLeft覆盖全屏幕
             if (_selectedRegion.IsEmpty)
             {
@@ -180,37 +184,35 @@ namespace CutterLogical
             else
             {
                 double temp = _selectedRegion.Left;
-                if (_maskRectangleLeft.Width != temp)
+                if (Math.Abs(_maskRectangleLeft.Width - temp) > 0.00001)
                 {
                     //以选择的区域为主，如果左边的遮罩矩形不等于选择框X轴的坐标时
                     _maskRectangleLeft.Width = temp < 0 ? 0 : temp;
                 }
                 temp = ActualWidth - _selectedRegion.Right;
-                if (_maskRectangleRight.Width != temp)
+                if (Math.Abs(_maskRectangleRight.Width - temp) > 0.00001)
                 {
                     _maskRectangleRight.Width = temp < 0 ? 0 : temp;
                 }
-                if (_maskRectangleRight.Height != actualHeight)
+                if (Math.Abs(_maskRectangleRight.Height - actualHeight) > 0.00001)
                 {
                     _maskRectangleRight.Height = actualHeight;
                 }
-
                 SetLeft(_maskRectangleTop, _maskRectangleLeft.Width);
                 SetLeft(_maskRectangleBottom, _maskRectangleLeft.Width);
                 temp = actualWidth - _maskRectangleLeft.Width - _maskRectangleRight.Width;
-                if (_maskRectangleTop.Width != temp)
+                if (Math.Abs(_maskRectangleTop.Width - temp) > 0.00001)
                 {
                     _maskRectangleTop.Width = temp < 0 ? 0 : temp;
                 }
                 temp = _selectedRegion.Top;
-                if (_maskRectangleTop.Height != temp)
+                if (Math.Abs(_maskRectangleTop.Height - temp) > 0.00001)
                 {
                     _maskRectangleTop.Height = temp < 0 ? 0 : temp;
                 }
-
                 _maskRectangleBottom.Width = _maskRectangleTop.Width;
                 temp = actualHeight - _selectedRegion.Bottom;
-                if (_maskRectangleBottom.Height != temp)
+                if (Math.Abs(_maskRectangleBottom.Height - temp) > 0.00001)
                 {
                     _maskRectangleBottom.Height = temp < 0 ? 0 : temp;
                 }
@@ -232,7 +234,7 @@ namespace CutterLogical
             //判断鼠标是否点击在定义的四个矩形上面，如果符合，就把选择框弹出，把画布锁住，并得到初始点，最后设置截图开始
             if (IsMouseOnThis(e)&&_operation=="")
             {
-                if (!this.Children.Contains(_selectingRectangle))
+                if (!Children.Contains(_selectingRectangle))
                 {
                     _selectingRectangle = new Rectangle();
                     //选择框的Border颜色与厚度
@@ -240,8 +242,6 @@ namespace CutterLogical
                     _selectingRectangle.StrokeThickness = 2.0;
                     Children.Add(_selectingRectangle);
                 }
-                ////StartToShowMask(e.GetPosition(this));
-                //_selectedStartPoint = new Point?(e.GetPosition(this));
                 if (!IsMouseCaptured)
                 {
                     CaptureMouse();
@@ -253,7 +253,7 @@ namespace CutterLogical
                 }
 
             }
-            //如果点击在画布上面，就代表是移动
+            //如果点击在画布上面，就代表是移动、双击截图由或者添加矩形，椭圆，文字等操作
             else if (e.Source.Equals(this))
             {
                 if (e.ClickCount >= 2)
@@ -297,7 +297,7 @@ namespace CutterLogical
                         }
                         else if (_operation == "Text")
                         {
-                            if (!flag)
+                            if (!_flag)
                             {
                                 _drawTextBox = new TextBox();
                                 _drawTextBox.LostFocus += _drawTextBox_LostFocus;
@@ -305,7 +305,7 @@ namespace CutterLogical
                                 dictionary.Source =
                                     new Uri(@"pack://application:,,,/CutterLogical;component/Styles/TextBoxStyle.xaml",
                                         UriKind.RelativeOrAbsolute);
-                                this.Resources.MergedDictionaries.Add(dictionary);
+                                Resources.MergedDictionaries.Add(dictionary);
                                 _drawTextBox.MinWidth = 30 < _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1
                                     ? 30 : _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
                                 _drawTextBox.MinHeight = 50 < _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1
@@ -319,16 +319,17 @@ namespace CutterLogical
                                 _drawTextBox.Focus();
 
                                 RectToTextParameter rectToTextParameter = new RectToTextParameter();
-                                rectToTextParameter.Rect = new Rect(((Point) _selectedStartPoint).X,
+                                 _drawRect= new Rect(((Point) _selectedStartPoint).X,
                                     ((Point) _selectedStartPoint).Y, _drawTextBox.ActualWidth, _drawTextBox.ActualHeight);
+                                rectToTextParameter.Rect = _drawRect;
                                 rectToTextParameter.Text = _drawTextBox.Text;
                                 _textBoxAndTextDict[_drawTextBox] = rectToTextParameter;
-                                flag = true;
+                                _flag = true;
                             }
-                            else if (flag)
+                            else if (_flag)
                             {
                                 _drawTextBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-                                flag = false;
+                                _flag = false;
                             }
                         }
                     }
@@ -353,8 +354,8 @@ namespace CutterLogical
             TextBox textBox = sender as TextBox;
             if (_selectedStartPoint.HasValue && textBox!=null)
             {
-                _drawRect = new Rect(((Point) _selectedStartPoint).X, ((Point) _selectedStartPoint).Y,
-                    textBox.ActualWidth, textBox.ActualHeight);
+                _drawRect.Width = textBox.ActualWidth;
+                _drawRect.Height = textBox.ActualHeight;
                 Console.WriteLine("起始地点："+ ((Point)_selectedStartPoint).X+">>>" + ((Point)_selectedStartPoint).Y);
                 RectToTextParameter rectToTextParameter = _textBoxAndTextDict[textBox];
                 rectToTextParameter.Rect = _drawRect;
@@ -628,8 +629,12 @@ namespace CutterLogical
                
                 //操作窗体的显示位置
                 _operationWindow.Visibility = Visibility.Visible;
-                SetTop(_operationWindow, _selectedRegion.Bottom);
-                SetLeft(_operationWindow, _selectedRegion.Right - _operationWindow.Width);
+                if (!_selectedRegion.IsEmpty)
+                {
+                    SetTop(_operationWindow, _selectedRegion.Bottom);
+                    SetLeft(_operationWindow, _selectedRegion.Right - _operationWindow.Width);
+                }
+                _catchFinished = false;
             }
         }
 
