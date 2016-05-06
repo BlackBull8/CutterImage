@@ -75,41 +75,7 @@ namespace CutterLogical
         {
             if (!selectedRegion.IsEmpty)
             {
-                //根据BitmapSource类型创建RenderTargetBitmap
-                var rtbitmap = new RenderTargetBitmap(_bmpSource.PixelWidth, _bmpSource.PixelHeight, _bmpSource.DpiX,
-                    _bmpSource.DpiY, PixelFormats.Default);
-                //创建画笔
-                Pen pen=new Pen();
-                pen.Thickness = 2;
-                pen.Brush=new SolidColorBrush(Colors.Red);
-                //使用DrawingVisual和DrawingContext进行绘画
-                var drawingVisual=new DrawingVisual();
-                using (var dc = drawingVisual.RenderOpen())
-                {
-                    //输出图像
-                    dc.DrawImage(_bmpSource, new Rect(0, 0, _bmpSource.Width, _bmpSource.Height));
-                    //输出添加的矩形
-                    foreach (Rect rect in listRectangleRects)
-                    {
-                        dc.DrawRectangle(new SolidColorBrush(Colors.Transparent),pen,rect);
-                    }
-                    //输出添加的椭圆
-                    foreach (Rect ellipseTect in listEllipseTects)
-                    {                        
-                        dc.DrawEllipse(new SolidColorBrush(Colors.Transparent),pen,new Point((ellipseTect.Left+ellipseTect.Right)/2, (ellipseTect.Top + ellipseTect.Bottom) / 2),(ellipseTect.Right-ellipseTect.Left)/2,(ellipseTect.Bottom-ellipseTect.Top)/2);
-                    }
-                    //输出添加的文字
-                    foreach (RectToTextParameter rectToTextParameter in listTextRects)
-                    {
-                        var text=new FormattedText(rectToTextParameter.Text,System.Globalization.CultureInfo.CurrentUICulture,System.Windows.FlowDirection.LeftToRight,new Typeface(SystemFonts.MessageFontFamily,FontStyles.Normal,FontWeights.Normal,FontStretches.Normal),12,Brushes.Red);
-                        text.MaxTextHeight = rectToTextParameter.Rect.Height;
-                        text.MaxTextWidth = rectToTextParameter.Rect.Width;
-                        dc.DrawText(text,new Point(rectToTextParameter.Rect.X,rectToTextParameter.Rect.Y));
-                    }                  
-                }
-                //调用RenderTargetBitmap的Render方法，并传入刚才创建的drawingVisual对象
-                rtbitmap.Render(drawingVisual);
-
+                var rtbitmap = RenderTargetBitmapMethod(listRectangleRects, listEllipseTects, listTextRects);
                 //截图完毕，放到剪贴板当中
                 Bitmap catchedBmp = new Bitmap((int)selectedRegion.Width, (int)selectedRegion.Height);
                 Graphics g = Graphics.FromImage(catchedBmp);
@@ -129,6 +95,65 @@ namespace CutterLogical
             }
         }
 
-        
+        /// <summary>
+        /// 添加矩形，椭圆或文字操作
+        /// </summary>
+        /// <param name="listRectangleRects"></param>
+        /// <param name="listEllipseTects"></param>
+        /// <param name="listTextRects"></param>
+        /// <returns></returns>
+        private RenderTargetBitmap RenderTargetBitmapMethod(List<Rect> listRectangleRects, List<Rect> listEllipseTects, List<RectToTextParameter> listTextRects)
+        {
+            //根据BitmapSource类型创建RenderTargetBitmap
+            var rtbitmap = new RenderTargetBitmap(_bmpSource.PixelWidth, _bmpSource.PixelHeight, _bmpSource.DpiX,
+                _bmpSource.DpiY, PixelFormats.Default);
+            //创建画笔
+            Pen pen = new Pen();
+            pen.Thickness = 2;
+            pen.Brush = new SolidColorBrush(Colors.Red);
+            //使用DrawingVisual和DrawingContext进行绘画
+            var drawingVisual = new DrawingVisual();
+            using (var dc = drawingVisual.RenderOpen())
+            {
+                //输出图像
+                dc.DrawImage(_bmpSource, new Rect(0, 0, _bmpSource.Width, _bmpSource.Height));
+                //输出添加的矩形
+                foreach (Rect rect in listRectangleRects)
+                {
+                    dc.DrawRectangle(new SolidColorBrush(Colors.Transparent), pen, rect);
+                }
+                //输出添加的椭圆
+                foreach (Rect ellipseTect in listEllipseTects)
+                {
+                    dc.DrawEllipse(new SolidColorBrush(Colors.Transparent), pen,
+                        new Point((ellipseTect.Left + ellipseTect.Right) / 2, (ellipseTect.Top + ellipseTect.Bottom) / 2),
+                        (ellipseTect.Right - ellipseTect.Left) / 2, (ellipseTect.Bottom - ellipseTect.Top) / 2);
+                }
+                //输出添加的文字
+                foreach (RectToTextParameter rectToTextParameter in listTextRects)
+                {
+                    var text = new FormattedText(rectToTextParameter.Text, System.Globalization.CultureInfo.CurrentUICulture,
+                        System.Windows.FlowDirection.LeftToRight,
+                        new Typeface(SystemFonts.MessageFontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
+                        12, Brushes.Red);
+                    text.MaxTextHeight = rectToTextParameter.Rect.Height;
+                    text.MaxTextWidth = rectToTextParameter.Rect.Width;
+                    dc.DrawText(text, new Point(rectToTextParameter.Rect.X, rectToTextParameter.Rect.Y));
+                }
+            }
+            //调用RenderTargetBitmap的Render方法，并传入刚才创建的drawingVisual对象
+            rtbitmap.Render(drawingVisual);
+            return rtbitmap;
+        }
+
+
+        public void SaveImageFile(Rect selectedRegion, List<Rect> listRectangleRects, List<Rect> listEllipseTects,
+            List<RectToTextParameter> listTextRects)
+        {
+            if (!selectedRegion.IsEmpty)
+            {
+                var rtbitmap = RenderTargetBitmapMethod(listRectangleRects, listEllipseTects, listTextRects);
+            }
+        }
     }
 }

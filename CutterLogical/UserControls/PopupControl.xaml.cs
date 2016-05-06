@@ -78,17 +78,17 @@ namespace CutterLogical.UserControls
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-
+            StartOperation("Save");
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-
+            StartOperation("Cancel");
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-
+            StartOperation("OK");
         }
     }
 }

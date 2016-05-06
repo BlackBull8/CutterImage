@@ -135,6 +135,25 @@ namespace CutterLogical
             {
                 _flag = false;
             }
+            else if (_operation == "Cancel")
+            {
+                MaskingCanvasOwner.DialogResult = true;
+                MaskingCanvasOwner.Close();
+            }
+            else if (_operation == "OK")
+            {
+                FinishWork();
+            }
+            else if (_operation == "Save")
+            {
+                var listTextRects = new List<RectToTextParameter>();
+                foreach (var rectToTextParameter in _textBoxAndTextDict.Values)
+                {
+                    listTextRects.Add(rectToTextParameter);
+                }
+                MaskingCanvasOwner.SaveImageFile(_selectedRegion, _listRects, _listRectEllipses,
+                listTextRects);
+            }
         }
 
         /// <summary>
@@ -226,8 +245,6 @@ namespace CutterLogical
 
         #endregion
 
-        #region override事件
-
         #region 鼠标左键按下事件
 
         /// <summary>
@@ -263,18 +280,11 @@ namespace CutterLogical
             {
                 if (e.ClickCount >= 2)
                 {
-                    Console.WriteLine("点击了两次");
+                    //Console.WriteLine("点击了两次");
                     //todo:进行截图
                     if (MaskingCanvasOwner != null)
                     {
-                        //将文字和显式位置作成参数进行传递
-                        var listTextRects = new List<RectToTextParameter>();
-                        foreach (var rectToTextParameter in _textBoxAndTextDict.Values)
-                        {
-                            listTextRects.Add(rectToTextParameter);
-                        }
-                        MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
-                            listTextRects);
+                        FinishWork();
                     }
                 }
                 else
@@ -311,6 +321,7 @@ namespace CutterLogical
                                 //添加输入文本框，并设置文本框的Style
                                 _drawTextBox = new TextBox();
                                 _drawTextBox.LostFocus += _drawTextBox_LostFocus;
+                                _drawTextBox.GotFocus += _drawTextBox_GotFocus;
                                 var dictionary = new ResourceDictionary();
                                 dictionary.Source =
                                     new Uri(@"pack://application:,,,/CutterLogical;component/Styles/TextBoxStyle.xaml",
@@ -329,7 +340,7 @@ namespace CutterLogical
                                 SetLeft(_drawTextBox, ((Point) _selectedStartPoint).X);
                                 SetTop(_drawTextBox, ((Point) _selectedStartPoint).Y);
                                 Children.Add(_drawTextBox);
-                                _drawTextBox.Focus();
+                                
                                 //对文字和文字显式的位置进行记录
                                 var rectToTextParameter = new RectToTextParameter();
                                 _drawRect = new Rect(((Point) _selectedStartPoint).X,
@@ -337,6 +348,7 @@ namespace CutterLogical
                                 rectToTextParameter.Rect = _drawRect;
                                 rectToTextParameter.Text = _drawTextBox.Text;
                                 _textBoxAndTextDict[_drawTextBox] = rectToTextParameter;
+                                _drawTextBox.Focus();
                                 _flag = true;
                             }
                             else if (_flag)
@@ -359,23 +371,63 @@ namespace CutterLogical
         }
 
         /// <summary>
-        ///     在文字输入框失去焦点时，记住文本框的位置，长度和宽度
+        /// 文字输入框获取焦点事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _drawTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (_selectedStartPoint.HasValue && textBox != null)
+            {
+                _drawRect = _textBoxAndTextDict[textBox].Rect;
+            }
+        }
+
+        /// <summary>
+        /// 在文字输入框失去焦点时，记住文本框的位置，长度和宽度
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _drawTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             var textBox = sender as TextBox;
+            
             if (_selectedStartPoint.HasValue && textBox != null)
             {
-                _drawRect.Width = textBox.ActualWidth;
-                _drawRect.Height = textBox.ActualHeight;
-                var rectToTextParameter = _textBoxAndTextDict[textBox];
-                rectToTextParameter.Rect = _drawRect;
-                rectToTextParameter.Text = textBox.Text;
+                if (textBox.Text.Trim() == "")
+                {
+                    _textBoxAndTextDict.Remove(textBox);
+                }
+                else
+                {
+                    _drawRect.Width = textBox.ActualWidth;
+                    _drawRect.Height = textBox.ActualHeight;
+                    var rectToTextParameter = _textBoxAndTextDict[textBox];
+                    rectToTextParameter.Rect = _drawRect;
+                    rectToTextParameter.Text = textBox.Text;                    
+                }
                 _drawRect = Rect.Empty;
             }
         }
+
+
+        /// <summary>
+        /// 完成截图
+        /// </summary>
+        private void FinishWork()
+        {
+            //将文字和显式位置作成参数进行传递
+            var listTextRects = new List<RectToTextParameter>();
+            foreach (var rectToTextParameter in _textBoxAndTextDict.Values)
+            {
+                listTextRects.Add(rectToTextParameter);
+            }
+            MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
+                listTextRects);
+        }
+
+       
 
         //判断鼠标是否点在定义的四个矩形上面
         private bool IsMouseOnThis(RoutedEventArgs e)
@@ -772,6 +824,5 @@ namespace CutterLogical
 
         #endregion
 
-        #endregion
     }
 }

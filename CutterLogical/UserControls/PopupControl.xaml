@@ -34,19 +34,19 @@
             </ToggleButton>
             <ToggleButton Grid.Column="2" Width="26" Height="21" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" Content="A" FontWeight="Bold" FontSize="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" x:Name="DrawTextTbn" Checked="DrawText_Checked" Unchecked="DrawText_UnChecked">
             </ToggleButton>
-            <Button Width="26" Height="21" Grid.Column="3" x:Name="BtnSave" Background="Transparent" BorderThickness="0" Click="BtnSave_Click">
+            <Button Width="26" Height="21" Grid.Column="3" x:Name="BtnSave" Background="Transparent" BorderThickness="0" Click="BtnSave_Click" ToolTip="保存">
                 <Button.Content>
                     <Image Source="../Images/Img_Save.png" Stretch="Fill"></Image>
                 </Button.Content>
             </Button>
 
-            <Button Width="26" Height="21" Grid.Column="4" x:Name="BtnCancel" Background="Transparent" BorderThickness="0" Click="BtnCancel_Click">
+            <Button Width="26" Height="21" Grid.Column="4" x:Name="BtnCancel" Background="Transparent" BorderThickness="0" Click="BtnCancel_Click" ToolTip="退出截图">
                 <Button.Content>
                     <Image Source="../Images/Img_Cancel.png" Stretch="Fill"></Image>
                 </Button.Content>
             </Button>
 
-            <Button Width="26" Height="21" Grid.Column="5" x:Name="BtnOk" Background="Transparent" BorderThickness="0" Click="BtnOk_Click">
+            <Button Width="26" Height="21" Grid.Column="5" x:Name="BtnOk" Background="Transparent" BorderThickness="0" Click="BtnOk_Click" ToolTip="完成截图">
                 <Button.Content>
                     <Image Source="../Images/Img_Ok.png" Stretch="Fill"></Image>
                 </Button.Content>
