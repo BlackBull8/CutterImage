@@ -150,6 +150,7 @@ namespace CutterLogical
                     {
                         string fileName = saveFileDialog.FileName;
                         int index = fileName.LastIndexOf('.');
+                        //获取文件格式
                         string extion = fileName.Substring(index + 1, fileName.Length - index - 1);
                         extion = extion.ToLower();
                         ImageFormat imageFormat = ImageFormat.Png;
@@ -157,19 +158,24 @@ namespace CutterLogical
                         {
                             case "jpg":
                             case "jepg":
-                                imageFormat=ImageFormat.Jpeg;
+                                imageFormat = ImageFormat.Jpeg;
                                 break;
                             case "png":
-                                imageFormat=ImageFormat.Png;
+                                imageFormat = ImageFormat.Png;
                                 break;
                             case "bmp":
-                                imageFormat=ImageFormat.Bmp;
+                                imageFormat = ImageFormat.Bmp;
                                 break;
                             case "gif":
-                                imageFormat=ImageFormat.Gif;
+                                imageFormat = ImageFormat.Gif;
                                 break;
                         }
-                        catchedBmp.Save(saveFileDialog.FileName,imageFormat);
+                        //保存
+                        catchedBmp.Save(saveFileDialog.FileName, imageFormat);
+                    }
+                    else
+                    {
+                        return;
                     }
                 }
                 g.Dispose();

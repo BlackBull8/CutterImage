@@ -31,6 +31,11 @@ namespace CutterLogical
             _visCollec.Add(_br);
         }
 
+        /// <summary>
+        /// 重新排列
+        /// </summary>
+        /// <param name="finalSize"></param>
+        /// <returns></returns>
         protected override Size ArrangeOverride(Size finalSize)
         {
             double offset = ThumbSize / 2;
@@ -126,9 +131,9 @@ namespace CutterLogical
         {
             back.Opacity = 0.6;
             var fef = new FrameworkElementFactory(typeof(Ellipse));
-            fef.SetValue(Ellipse.FillProperty, back);
-            fef.SetValue(Ellipse.StrokeProperty, Brushes.White);
-            fef.SetValue(Ellipse.StrokeThicknessProperty, (double)1);
+            fef.SetValue(Shape.FillProperty, back);
+            fef.SetValue(Shape.StrokeProperty, Brushes.White);
+            fef.SetValue(Shape.StrokeThicknessProperty, (double)1);
             return fef;
         }
 

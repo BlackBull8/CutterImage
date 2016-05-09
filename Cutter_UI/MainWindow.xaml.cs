@@ -1,43 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using CutterLogical;
 using Cutter_UI.UserControls;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Cutter_UI
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    ///     MainWindow.xaml 的交互逻辑
     /// </summary>
     public partial class MainWindow : Window
     {
         private readonly MainCaptureScreen _mainCaptureScreen = new MainCaptureScreen();
         private WindowInteropHelper _wndHelper;
+
         public MainWindow()
         {
             InitializeComponent();
-            
+
             //获取屏幕的宽度和高度
-            int width= (int)SystemParameters.PrimaryScreenWidth;
-            int height=(int)SystemParameters.PrimaryScreenHeight;
-            this.Top = 0;
-            this.Left = width/2-200;
+            var width = (int) SystemParameters.PrimaryScreenWidth;
+            var height = (int) SystemParameters.PrimaryScreenHeight;
+            Top = 0;
+            Left = width/2 - 200;
         }
 
         private void CutterBtn_Click(object sender, RoutedEventArgs e)
@@ -51,7 +39,7 @@ namespace Cutter_UI
         {
             //指定事件
             _mainCaptureScreen.NotifyEventHanlder += _mainCaptureScreen_NotifyEventHanlder;
-            uint ctrlHotKey = (uint) (KeyFlags.MOD_ALT | KeyFlags.MOD_CTRL);
+            var ctrlHotKey = (uint) (KeyFlags.MOD_ALT | KeyFlags.MOD_CTRL);
             _wndHelper = new WindowInteropHelper(this);
             if (!HotKey.RegisterHotKey(_wndHelper.Handle, 100, ctrlHotKey, Keys.A))
             {
@@ -63,7 +51,7 @@ namespace Cutter_UI
         private void _mainCaptureScreen_NotifyEventHanlder(object sender, EventArgs e)
         {
             //设置窗口状态
-            WindowState=WindowState.Normal;
+            WindowState = WindowState.Normal;
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
@@ -80,8 +68,8 @@ namespace Cutter_UI
 
         protected override void OnSourceInitialized(EventArgs e)
         {
-            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
-            source.AddHook(WndProc);
+            var source = PresentationSource.FromVisual(this) as HwndSource;
+            source?.AddHook(WndProc);
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
