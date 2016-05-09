@@ -1,22 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace CutterLogical.UserControls
 {
     /// <summary>
-    /// PopupControl.xaml 的交互逻辑
+    ///     PopupControl.xaml 的交互逻辑
     /// </summary>
     public partial class PopupControl : UserControl
     {
@@ -28,11 +17,11 @@ namespace CutterLogical.UserControls
         public event EventHandler<string> StartOperationEvent;
         public event EventHandler<string> CancelOperationEvent;
 
-
         private void DrawRectangleTb_Ckecked(object sender, RoutedEventArgs e)
         {
             DrawEllipseTbn.IsChecked = false;
             DrawTextTbn.IsChecked = false;
+            DrawArrowLineTbn.IsChecked = false;
             StartOperation("Rectangle");
         }
 
@@ -41,29 +30,43 @@ namespace CutterLogical.UserControls
             CancelOperation("Rectangle");
         }
 
-        
         private void DrawEllipseTb_Checked(object sender, RoutedEventArgs e)
         {
             DrawRectangleTbn.IsChecked = false;
             DrawTextTbn.IsChecked = false;
+            DrawArrowLineTbn.IsChecked = false;
             StartOperation("Ellipse");
         }
 
         private void DrawEllipseTb_UnChecked(object sender, RoutedEventArgs e)
         {
-           CancelOperation("Ellipse");
+            CancelOperation("Ellipse");
         }
 
         private void DrawText_Checked(object sender, RoutedEventArgs e)
         {
             DrawRectangleTbn.IsChecked = false;
             DrawEllipseTbn.IsChecked = false;
+            DrawArrowLineTbn.IsChecked = false;
             StartOperation("Text");
         }
 
         private void DrawText_UnChecked(object sender, RoutedEventArgs e)
         {
             CancelOperation("Text");
+        }
+
+        private void DrawArrowLineTbn_Checked(object sender, RoutedEventArgs e)
+        {
+            DrawRectangleTbn.IsChecked = false;
+            DrawEllipseTbn.IsChecked = false;
+            DrawTextTbn.IsChecked = false;
+            StartOperation("ArrowLine");
+        }
+
+        private void DrawArrowLineTbn_UnChecked(object sender, RoutedEventArgs e)
+        {
+            CancelOperation("ArrowLine");
         }
 
         private void StartOperation(string operation)

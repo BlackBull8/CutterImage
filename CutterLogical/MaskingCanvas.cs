@@ -154,7 +154,6 @@ namespace CutterLogical
                 }
                 MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
                listTextRects,2);
-                //MaskingCanvasOwner.SaveImageFile(_selectedRegion, _listRects, _listRectEllipses,listTextRects);
             }
         }
 
@@ -259,6 +258,7 @@ namespace CutterLogical
             //判断鼠标是否点击在定义的四个矩形上面，如果符合，就把选择框弹出，把画布锁住，并得到初始点，最后设置截图开始
             if (IsMouseOnThis(e) && _operation == "")
             {
+                _catchFinished = false;
                 if (!Children.Contains(_selectingRectangle))
                 {
                     _selectingRectangle = new Rectangle();
@@ -270,7 +270,7 @@ namespace CutterLogical
                 if (!IsMouseCaptured)
                 {
                     CaptureMouse();
-                }
+                }         
                 _catchStart = true;
                 if (_operationWindow.Visibility == Visibility.Visible)
                 {
@@ -302,56 +302,17 @@ namespace CutterLogical
                         _isDraw = true;
                         if (_operation == "Rectangle")
                         {
-                            _drawRectangle = new Rectangle();
-                            _drawRectangle.Stroke = new SolidColorBrush(Colors.Red);
-                            _drawRectangle.StrokeThickness = 2;
-                            Children.Add(_drawRectangle);
-                            _listRectangles.Add(_drawRectangle);
+                            DrawRectangle();
                         }
                         else if (_operation == "Ellipse")
                         {
-                            _drawEllipse = new Ellipse();
-                            _drawEllipse.Stroke = new SolidColorBrush(Colors.Red);
-                            _drawEllipse.StrokeThickness = 2;
-                            Children.Add(_drawEllipse);
-                            _listEllipses.Add(_drawEllipse);
+                            DrawEllipse();
                         }
                         else if (_operation == "Text")
                         {
                             if (!_flag)
                             {
-                                //添加输入文本框，并设置文本框的Style
-                                _drawTextBox = new TextBox();
-                                _drawTextBox.LostFocus += _drawTextBox_LostFocus;
-                                _drawTextBox.GotFocus += _drawTextBox_GotFocus;
-                                var dictionary = new ResourceDictionary();
-                                dictionary.Source =
-                                    new Uri(@"pack://application:,,,/CutterLogical;component/Styles/TextBoxStyle.xaml",
-                                        UriKind.RelativeOrAbsolute);
-                                Resources.MergedDictionaries.Add(dictionary);
-                                _drawTextBox.MinWidth = 30 < _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1
-                                    ? 30
-                                    : _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
-                                _drawTextBox.MinHeight = 50 <
-                                                         _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1
-                                    ? 50
-                                    : _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
-                                _drawTextBox.MaxWidth = _selectedRegion.Right - ((Point) _selectedStartPoint).X - 1;
-                                _drawTextBox.MaxHeight = _selectedRegion.Bottom - ((Point) _selectedStartPoint).Y - 1;
-                                _drawTextBox.TextWrapping = TextWrapping.Wrap;
-                                SetLeft(_drawTextBox, ((Point) _selectedStartPoint).X);
-                                SetTop(_drawTextBox, ((Point) _selectedStartPoint).Y);
-                                Children.Add(_drawTextBox);
-                                
-                                //对文字和文字显式的位置进行记录
-                                var rectToTextParameter = new RectToTextParameter();
-                                _drawRect = new Rect(((Point) _selectedStartPoint).X,
-                                    ((Point) _selectedStartPoint).Y, _drawTextBox.ActualWidth, _drawTextBox.ActualHeight);
-                                rectToTextParameter.Rect = _drawRect;
-                                rectToTextParameter.Text = _drawTextBox.Text;
-                                _textBoxAndTextDict[_drawTextBox] = rectToTextParameter;
-                                _drawTextBox.Focus();
-                                _flag = true;
+                                DrawText();
                             }
                             else if (_flag)
                             {
@@ -359,6 +320,10 @@ namespace CutterLogical
                                 _textBoxAndTextDict.Keys.Last().MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
                                 _flag = false;
                             }
+                        }
+                        else if (_operation == "ArrowLine")
+                        {
+                            DrawArrowLine();
                         }
                     }
                     //Console.WriteLine("点击了1次");
@@ -370,6 +335,81 @@ namespace CutterLogical
             }
             base.OnMouseLeftButtonDown(e);
         }
+
+        /// <summary>
+        /// 选择箭头工具时的操作
+        /// </summary>
+        private void DrawArrowLine()
+        {
+
+        }
+
+       
+
+        /// <summary>
+        /// 选择椭圆工具时的操作
+        /// </summary>
+        private void DrawEllipse()
+        {
+            _drawEllipse = new Ellipse();
+            _drawEllipse.Stroke = new SolidColorBrush(Colors.Red);
+            _drawEllipse.StrokeThickness = 2;
+            Children.Add(_drawEllipse);
+            _listEllipses.Add(_drawEllipse);
+        }
+
+        /// <summary>
+        /// 选择矩形工具时的操作
+        /// </summary>
+        private void DrawRectangle()
+        {
+            _drawRectangle = new Rectangle();
+            _drawRectangle.Stroke = new SolidColorBrush(Colors.Red);
+            _drawRectangle.StrokeThickness = 2;
+            Children.Add(_drawRectangle);
+            _listRectangles.Add(_drawRectangle);
+        }
+
+
+        /// <summary>
+        /// 选择文字工具时的操作
+        /// </summary>
+        private void DrawText()
+        {
+            //添加输入文本框，并设置文本框的Style
+            _drawTextBox = new TextBox();
+            _drawTextBox.LostFocus += _drawTextBox_LostFocus;
+            _drawTextBox.GotFocus += _drawTextBox_GotFocus;
+            var dictionary = new ResourceDictionary();
+            dictionary.Source =
+                new Uri(@"pack://application:,,,/CutterLogical;component/Styles/TextBoxStyle.xaml",
+                    UriKind.RelativeOrAbsolute);
+            Resources.MergedDictionaries.Add(dictionary);
+            _drawTextBox.MinWidth = 30 < _selectedRegion.Right - ((Point)_selectedStartPoint).X - 1
+                ? 30
+                : _selectedRegion.Right - ((Point)_selectedStartPoint).X - 1;
+            _drawTextBox.MinHeight = 50 <
+                                     _selectedRegion.Bottom - ((Point)_selectedStartPoint).Y - 1
+                ? 50
+                : _selectedRegion.Bottom - ((Point)_selectedStartPoint).Y - 1;
+            _drawTextBox.MaxWidth = _selectedRegion.Right - ((Point)_selectedStartPoint).X - 1;
+            _drawTextBox.MaxHeight = _selectedRegion.Bottom - ((Point)_selectedStartPoint).Y - 1;
+            _drawTextBox.TextWrapping = TextWrapping.Wrap;
+            SetLeft(_drawTextBox, ((Point)_selectedStartPoint).X);
+            SetTop(_drawTextBox, ((Point)_selectedStartPoint).Y);
+            Children.Add(_drawTextBox);
+
+            //对文字和文字显式的位置进行记录
+            var rectToTextParameter = new RectToTextParameter();
+            _drawRect = new Rect(((Point)_selectedStartPoint).X,
+                ((Point)_selectedStartPoint).Y, _drawTextBox.ActualWidth, _drawTextBox.ActualHeight);
+            rectToTextParameter.Rect = _drawRect;
+            rectToTextParameter.Text = _drawTextBox.Text;
+            _textBoxAndTextDict[_drawTextBox] = rectToTextParameter;
+            _drawTextBox.Focus();
+            _flag = true;
+        }
+
 
         /// <summary>
         /// 文字输入框获取焦点事件
@@ -704,7 +744,6 @@ namespace CutterLogical
                     SetTop(_operationWindow, _selectedRegion.Bottom);
                     SetLeft(_operationWindow, _selectedRegion.Right - _operationWindow.Width);
                 }
-                _catchFinished = false;
             }
         }
 

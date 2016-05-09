@@ -32,7 +32,7 @@ namespace CutterLogical
         }
 
         /// <summary>
-        /// 重新排列
+        /// 重新规划
         /// </summary>
         /// <param name="finalSize"></param>
         /// <returns></returns>
@@ -57,6 +57,13 @@ namespace CutterLogical
                 element.Height = element.RenderSize.Height;
         }
 
+        /// <summary>
+        /// 生成Thumb控件并使用DragDelta响应鼠标拖放
+        /// </summary>
+        /// <param name="cur"></param>
+        /// <param name="hor"></param>
+        /// <param name="ver"></param>
+        /// <returns></returns>
         Thumb GetResizeThumb(Cursor cur, HorizontalAlignment hor, VerticalAlignment ver)
         {
             var thumb = new Thumb()

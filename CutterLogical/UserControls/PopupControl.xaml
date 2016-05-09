@@ -20,40 +20,47 @@
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <ToggleButton Width="26" Height="22" Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" Checked="DrawRectangleTb_Ckecked" Unchecked="DrawRectangleTb_UnChecked" x:Name="DrawRectangleTbn">
+            <ToggleButton Width="26" Height="22" Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" Checked="DrawRectangleTb_Ckecked" Unchecked="DrawRectangleTb_UnChecked" x:Name="DrawRectangleTbn" ToolTip="矩形工具">
                 <ToggleButton.Content>
                     <Rectangle Width="20" Height="15" Stroke="Black" StrokeThickness="2" Margin="1"></Rectangle>
                 </ToggleButton.Content>
             </ToggleButton>
             
-            <ToggleButton Width="26" Height="22" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Checked="DrawEllipseTb_Checked" Unchecked="DrawEllipseTb_UnChecked" x:Name="DrawEllipseTbn">
+            <ToggleButton Width="26" Height="22" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Checked="DrawEllipseTb_Checked" Unchecked="DrawEllipseTb_UnChecked" x:Name="DrawEllipseTbn" ToolTip="椭圆工具">
                 <ToggleButton.Content>
                     <Ellipse Stroke="Black" Width="20" Height="15" StrokeThickness="2" Margin="1"></Ellipse>
                 </ToggleButton.Content>
             </ToggleButton>
-            
-            <ToggleButton Grid.Column="2" Width="26" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" x:Name="DrawTextTbn" Checked="DrawText_Checked" Unchecked="DrawText_UnChecked">
+
+            <ToggleButton Grid.Column="2" Width="26" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" x:Name="DrawArrowLineTbn" Checked="DrawArrowLineTbn_Checked" Unchecked="DrawArrowLineTbn_UnChecked" ToolTip="箭头工具">
                 <ToggleButton.Content>
-                    <Image Source="../Images/WriteText.ico" Stretch="Fill"></Image>
+                    <Image Source="../Images/LineArrow.ico" Stretch="Fill" Width="16" Height="16" ></Image>
+                </ToggleButton.Content>
+            </ToggleButton>
+
+            <ToggleButton Grid.Column="3" Width="26" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" x:Name="DrawTextTbn" Checked="DrawText_Checked" Unchecked="DrawText_UnChecked" ToolTip="文字工具">
+                <ToggleButton.Content>
+                    <Image Source="../Images/WriteText.ico" Stretch="Fill" Width="19" Height="17"></Image>
                 </ToggleButton.Content>
             </ToggleButton>
             
-            <Button Width="26" Height="22" Grid.Column="3" x:Name="BtnSave" Background="Transparent" BorderThickness="0" Click="BtnSave_Click" ToolTip="保存">
+            <Button Width="26" Height="22" Grid.Column="4" x:Name="BtnSave" Background="Transparent" BorderThickness="0" Click="BtnSave_Click" ToolTip="保存">
                 <Button.Content>
-                    <Image Source="../Images/Save.ico" Stretch="Fill"></Image>
+                    <Image Source="../Images/Save.ico" Stretch="Fill" Width="19" Height="18"></Image>
                 </Button.Content>
             </Button>
 
-            <Button Width="26" Height="22" Grid.Column="4" x:Name="BtnCancel" Background="Transparent" BorderThickness="0" Click="BtnCancel_Click" ToolTip="退出截图">
+            <Button Width="26" Height="22" Grid.Column="5" x:Name="BtnCancel" Background="Transparent" BorderThickness="0" Click="BtnCancel_Click" ToolTip="退出截图">
                 <Button.Content>
-                    <Image Source="../Images/Cancel.ico" Stretch="Fill"></Image>
+                    <Image Source="../Images/Cancel.ico" Stretch="Fill" Width="19" Height="17"></Image>
                 </Button.Content>
             </Button>
 
-            <Button Width="26" Height="22" Grid.Column="5" x:Name="BtnOk" Background="Transparent" BorderThickness="0" Click="BtnOk_Click" ToolTip="完成截图">
+            <Button Width="26" Height="22" Grid.Column="6" x:Name="BtnOk" Background="Transparent" BorderThickness="0" Click="BtnOk_Click" ToolTip="完成截图">
                 <Button.Content>
-                    <Image Source="../Images/Ok.ico" Stretch="Fill"></Image>
+                    <Image Source="../Images/Ok.ico" Stretch="Fill" Width="19" Height="17"></Image>
                 </Button.Content>
             </Button>
         </Grid>
