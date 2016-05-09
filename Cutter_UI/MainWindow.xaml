@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Cutter_UI"
         mc:Ignorable="d" x:Name="WindowUI" WindowStartupLocation="Manual"
-        Title="截屏小程序" Height="60" Width="300" Topmost="True" ResizeMode="NoResize" Loaded="MainWindow_OnLoaded">
+        Title="截屏小程序" Height="60" Width="300" Topmost="True" ResizeMode="NoResize" Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing">
     <Grid>
-        <Button Content="开始截屏" Click="CutterBtn_Click"></Button>
+        <Button Content="开始截屏" Click="CutterBtn_Click" x:Name="CutterBtn"></Button>
     </Grid>
 </Window>
