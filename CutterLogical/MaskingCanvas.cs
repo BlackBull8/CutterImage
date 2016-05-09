@@ -152,8 +152,9 @@ namespace CutterLogical
                 {
                     listTextRects.Add(rectToTextParameter);
                 }
-                MaskingCanvasOwner.SaveImageFile(_selectedRegion, _listRects, _listRectEllipses,
-                listTextRects);
+                MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
+               listTextRects,2);
+                //MaskingCanvasOwner.SaveImageFile(_selectedRegion, _listRects, _listRectEllipses,listTextRects);
             }
         }
 
@@ -360,7 +361,7 @@ namespace CutterLogical
                             }
                         }
                     }
-                    Console.WriteLine("点击了1次");
+                    //Console.WriteLine("点击了1次");
 
                     if (!IsMouseCaptured)
                     {
@@ -431,7 +432,7 @@ namespace CutterLogical
                 listTextRects.Add(rectToTextParameter);
             }
             MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
-                listTextRects);
+                listTextRects,1);
         }
 
        
