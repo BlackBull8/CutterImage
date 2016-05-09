@@ -7,6 +7,6 @@
         mc:Ignorable="d" x:Name="WindowUI" WindowStartupLocation="Manual"
         Title="截屏小程序" Height="60" Width="300" Topmost="True" ResizeMode="NoResize" Loaded="MainWindow_OnLoaded" Closing="MainWindow_OnClosing">
     <Grid>
-        <Button Content="开始截屏" Click="CutterBtn_Click" x:Name="CutterBtn"></Button>
+        <Button Content="点击按钮或使用快捷键Alt+Ctrl+A进行操作" Click="CutterBtn_Click" x:Name="CutterBtn"></Button>
     </Grid>
 </Window>

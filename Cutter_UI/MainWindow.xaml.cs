@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CutterLogical;
+using Cutter_UI.UserControls;
 using MessageBox = System.Windows.MessageBox;
 
 namespace Cutter_UI
@@ -54,7 +55,8 @@ namespace Cutter_UI
             _wndHelper = new WindowInteropHelper(this);
             if (!HotKey.RegisterHotKey(_wndHelper.Handle, 100, ctrlHotKey, Keys.A))
             {
-                MessageBox.Show("热键已被注册，已不能使用！！请点击按钮进行操作");
+                //MessageBox.Show("热键已被注册，已不能使用！！请点击按钮进行操作");
+                MessageBoxDiy.Show("提示", "热键已被注册，已不能使用!\r\n请点击按钮进行操作!");
             }
         }
 
