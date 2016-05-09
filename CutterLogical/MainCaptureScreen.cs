@@ -8,6 +8,7 @@ namespace CutterLogical
         public void StartToCapture()
         {
             ScreenImageUI mainCutterUI =new ScreenImageUI(this);
+            mainCutterUI.Topmost = true;
             if (mainCutterUI.ShowDialog()==true)
             {
                 NotifyEventHanlder?.Invoke(this, new EventArgs());

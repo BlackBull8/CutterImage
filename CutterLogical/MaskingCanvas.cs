@@ -362,7 +362,6 @@ namespace CutterLogical
                         }
                     }
                     //Console.WriteLine("点击了1次");
-
                     if (!IsMouseCaptured)
                     {
                         CaptureMouse();
@@ -380,12 +379,6 @@ namespace CutterLogical
         private void _drawTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             _flag = true;
-            //var textBox = sender as TextBox;
-            //_drawTextBox = textBox;
-            //if (_selectedStartPoint.HasValue && textBox != null)
-            //{
-            //    _drawRect = _textBoxAndTextDict[textBox].Rect;
-            //}
         }
 
         /// <summary>
@@ -436,7 +429,6 @@ namespace CutterLogical
         }
 
        
-
         //判断鼠标是否点在定义的四个矩形上面
         private bool IsMouseOnThis(RoutedEventArgs e)
         {
@@ -769,7 +761,6 @@ namespace CutterLogical
         {
             _selectedRegion = Rect.Empty;
             Children.Remove(_selectingRectangle);
-            //_selectingRectangle = null;
             foreach (var rectangle in _listRectangles)
             {
                 Children.Remove(rectangle);
