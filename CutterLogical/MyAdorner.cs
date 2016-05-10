@@ -93,8 +93,7 @@ namespace CutterLogical
                         {
                             element.Height += e.VerticalChange;
                             VerticalAlignmentEventArgs arg=new VerticalAlignmentEventArgs() {Dist=e.VerticalChange,VerticalType=VerticalAlignment.Bottom};
-                            if(VerticEventHandler!=null)
-                            VerticEventHandler(this, arg);
+                            VerticEventHandler?.Invoke(this, arg);
                         }
                         break;
                     case VerticalAlignment.Top:
@@ -103,8 +102,7 @@ namespace CutterLogical
                             element.Height -= e.VerticalChange;
                             Canvas.SetTop(element, Canvas.GetTop(element) + e.VerticalChange);
                             VerticalAlignmentEventArgs arg = new VerticalAlignmentEventArgs() { Dist = e.VerticalChange, VerticalType = VerticalAlignment.Top };
-                            if (VerticEventHandler != null)
-                                VerticEventHandler(this, arg);
+                            VerticEventHandler?.Invoke(this, arg);
                         }
                         break;
                 }
@@ -116,8 +114,7 @@ namespace CutterLogical
                             element.Width -= e.HorizontalChange;
                             Canvas.SetLeft(element, Canvas.GetLeft(element) + e.HorizontalChange);
                             HorizontalAlignmentEventArgs arg=new HorizontalAlignmentEventArgs() {Dist=e.HorizontalChange,HorizontalType=HorizontalAlignment.Left};
-                            if (HoriEventHandler != null)
-                                HoriEventHandler(this, arg);
+                            HoriEventHandler?.Invoke(this, arg);
                         }
                         break;
                     case HorizontalAlignment.Right:
@@ -136,6 +133,7 @@ namespace CutterLogical
         }
         FrameworkElementFactory GetFactory(Brush back)
         {
+            
             back.Opacity = 0.6;
             var fef = new FrameworkElementFactory(typeof(Ellipse));
             fef.SetValue(Shape.FillProperty, back);

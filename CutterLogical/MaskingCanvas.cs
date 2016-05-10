@@ -71,10 +71,14 @@ namespace CutterLogical
         private readonly List<Rect> _listRectEllipses = new List<Rect>();
         private readonly List<Ellipse> _listEllipses = new List<Ellipse>();
 
+        //添加箭头线所需要的字段
+        private Arrow _arrow;
+        private readonly List<List<double>> _listArrowLineRects = new List<List<double>>();
+        private readonly List<Arrow> _listArrowLines=new List<Arrow>();
+
         //添加文字所需要的字段
         private TextBox _drawTextBox;
         private bool _flag;
-
         private readonly Dictionary<TextBox, RectToTextParameter> _textBoxAndTextDict =
             new Dictionary<TextBox, RectToTextParameter>();
 
@@ -153,7 +157,7 @@ namespace CutterLogical
                     listTextRects.Add(rectToTextParameter);
                 }
                 MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
-               listTextRects,2);
+               listTextRects,_listArrowLineRects,2);
             }
         }
 
@@ -282,7 +286,6 @@ namespace CutterLogical
             {
                 if (e.ClickCount >= 2)
                 {
-                    //Console.WriteLine("点击了两次");
                     //todo:进行截图
                     if (MaskingCanvasOwner != null)
                     {
@@ -326,7 +329,6 @@ namespace CutterLogical
                             DrawArrowLine();
                         }
                     }
-                    //Console.WriteLine("点击了1次");
                     if (!IsMouseCaptured)
                     {
                         CaptureMouse();
@@ -341,11 +343,18 @@ namespace CutterLogical
         /// </summary>
         private void DrawArrowLine()
         {
-
+            _arrow=new Arrow();
+            _arrow.X1 = _arrow.X2=((Point) _selectedStartPoint).X;
+            _arrow.Y1 = _arrow.Y2=((Point)_selectedStartPoint).Y;
+            _arrow.HeadWidth = 15;
+            _arrow.HeadHeight = 5;
+            _arrow.Stroke = Brushes.Red;
+            _arrow.StrokeThickness = 3;
+            _arrow.Visibility=Visibility.Collapsed;
+            Children.Add(_arrow);
+            _listArrowLines.Add(_arrow);
         }
-
-       
-
+      
         /// <summary>
         /// 选择椭圆工具时的操作
         /// </summary>
@@ -465,7 +474,7 @@ namespace CutterLogical
                 listTextRects.Add(rectToTextParameter);
             }
             MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
-                listTextRects,1);
+                listTextRects, _listArrowLineRects,1);
         }
 
        
@@ -569,28 +578,48 @@ namespace CutterLogical
                     _drawRect = new Rect(x, y, w, h);
                     if (_operation == "Rectangle")
                     {
-                        //_listRects.Add(_drawRect);
-
                         _drawRectangle.Width = w;
                         _drawRectangle.Height = h;
                         SetLeft(_drawRectangle, x);
                         SetTop(_drawRectangle, y);
-                        //_drawRectangle.Visibility = Visibility.Visible;
                     }
                     else if (_operation == "Ellipse")
                     {
-                        //Console.WriteLine("开始画椭圆");
-                        //_listRectEllipses.Add(_drawRect);
                         _drawEllipse.Width = w;
                         _drawEllipse.Height = h;
                         SetLeft(_drawEllipse, x);
                         SetTop(_drawEllipse, y);
                     }
+                    else if (_operation == "ArrowLine")
+                    {
+                        if (_arrow.Visibility == Visibility.Collapsed)
+                        {
+                            _arrow.Visibility = Visibility.Visible;
+                        }
+                        double originalX = ((Point) _selectedEndPoint).X;
+                        double originalY = ((Point) _selectedEndPoint).Y;
+
+                        if (originalX > _selectedRegion.Right)
+                        {
+                            originalX = _selectedRegion.Right;
+                        }
+                        else if (originalX < _selectedRegion.Left)
+                        {
+                            originalX = _selectedRegion.Left;
+                        }
+
+                        if (originalY > _selectedRegion.Bottom)
+                        {
+                            originalY = _selectedRegion.Bottom;
+                        }
+                        else if (originalY < _selectedRegion.Top)
+                        {
+                            originalY = _selectedRegion.Top;
+                        }
+                        _arrow.X2 = originalX;
+                        _arrow.Y2 = originalY;                        
+                    }
                 }
-            }
-            else
-            {
-                MessageBox.Show("_selectedStartPoint点为空");
             }
         }
 
@@ -714,6 +743,13 @@ namespace CutterLogical
                         _drawRect = Rect.Empty;
                     }
                 }
+                else if (_operation == "ArrowLine")
+                {
+                    if (!_drawRect.IsEmpty)
+                    {
+                        _listArrowLineRects.Add(new List<double>() {_arrow.X1,_arrow.Y1,_arrow.X2,_arrow.Y2 });
+                    }
+                }
                 _isDraw = false;
             }
             base.OnMouseLeftButtonUp(e);
@@ -736,7 +772,6 @@ namespace CutterLogical
                 myCanvasAdorner.VerticEventHandler += MyCanvasAdorner_VerticEventHandler;
                 var layer = AdornerLayer.GetAdornerLayer(this);
                 layer.Add(myCanvasAdorner);
-
                 //操作窗体的显示位置
                 _operationWindow.Visibility = Visibility.Visible;
                 if (!_selectedRegion.IsEmpty)
@@ -817,6 +852,12 @@ namespace CutterLogical
                 Children.Remove(textBox);
             }
             _textBoxAndTextDict.Clear();
+            foreach (Arrow arrow in _listArrowLines)
+            {
+                Children.Remove(arrow);
+            }
+            _listArrowLines.Clear();
+            _listArrowLineRects.Clear();
             _operationWindow.DrawEllipseTbn.IsChecked =
                 _operationWindow.DrawRectangleTbn.IsChecked = _operationWindow.DrawTextTbn.IsChecked = false;
             _operation = "";
