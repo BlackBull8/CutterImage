@@ -176,7 +176,7 @@ namespace CutterLogical
                     //输出添加的箭头直线
                     foreach (Arrow arrow in listArrowLineRects)
                     {
-                        dc.DrawGeometry(new SolidColorBrush(Colors.Transparent),new Pen(Brushes.Red ,3), arrow.ArrowLineGeometry);
+                        dc.DrawGeometry(new SolidColorBrush(Colors.Transparent),new Pen(Brushes.Red ,2), arrow.ArrowLineGeometry);
                     }
                 }
                 //调用RenderTargetBitmap的Render方法，并传入刚才创建的drawingVisual对象

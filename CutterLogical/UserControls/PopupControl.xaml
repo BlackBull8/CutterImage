@@ -24,13 +24,15 @@
             </Grid.ColumnDefinitions>
             <ToggleButton Width="26" Height="22" Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" Checked="DrawRectangleTb_Ckecked" Unchecked="DrawRectangleTb_UnChecked" x:Name="DrawRectangleTbn" ToolTip="矩形工具">
                 <ToggleButton.Content>
-                    <Rectangle Width="20" Height="15" Stroke="Black" StrokeThickness="2" Margin="1"></Rectangle>
+                    <!--<Rectangle Width="20" Height="15" Stroke="Black" StrokeThickness="2" Margin="1"></Rectangle>-->
+                    <Image Source="../Images/Rectangle.ico" Stretch="Fill" Width="16" Height="16" Margin="1" ></Image>
                 </ToggleButton.Content>
             </ToggleButton>
             
             <ToggleButton Width="26" Height="22" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="Transparent" BorderThickness="0" Checked="DrawEllipseTb_Checked" Unchecked="DrawEllipseTb_UnChecked" x:Name="DrawEllipseTbn" ToolTip="椭圆工具">
                 <ToggleButton.Content>
-                    <Ellipse Stroke="Black" Width="20" Height="15" StrokeThickness="2" Margin="1"></Ellipse>
+                    <!--<Ellipse Stroke="Black" Width="20" Height="15" StrokeThickness="2" Margin="1"></Ellipse>-->
+                    <Image Source="../Images/Ellipse.ico" Stretch="Fill" Width="19" Height="17" Margin="1" ></Image>
                 </ToggleButton.Content>
             </ToggleButton>
 

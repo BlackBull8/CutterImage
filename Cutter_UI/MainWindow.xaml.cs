@@ -10,7 +10,7 @@ using CutterLogical.UserControls;
 namespace Cutter_UI
 {
     /// <summary>
-    ///     MainWindow.xaml 的交互逻辑
+    /// MainWindow.xaml 的交互逻辑
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -54,13 +54,13 @@ namespace Cutter_UI
             FlushMemory();
         }
 
-        
-
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             HotKey.UnregisterHotKey(_wndHelper.Handle, 100);
         }
 
+
+        #region 热键注与消息监听
         private void GlobalKeyProcess()
         {
             WindowState = WindowState.Minimized;
@@ -82,6 +82,7 @@ namespace Cutter_UI
             }
             return IntPtr.Zero;
         }
+        #endregion
 
         #region 强制内存回收
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]

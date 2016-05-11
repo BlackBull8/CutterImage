@@ -352,7 +352,7 @@ namespace CutterLogical
             _arrow.HeadWidth = 15;
             _arrow.HeadHeight = 5;
             _arrow.Stroke = Brushes.Red;
-            _arrow.StrokeThickness = 3;
+            _arrow.StrokeThickness = 2;
             _arrow.Visibility = Visibility.Collapsed;
             Children.Add(_arrow);
         }
@@ -549,7 +549,7 @@ namespace CutterLogical
                 }
                 else if (startPoint.X < _selectedRegion.X)
                 {
-                    startPoint.X = _selectedRegion.X - 2;
+                    startPoint.X = _selectedRegion.X + 2;
                 }
 
                 if (startPoint.Y > _selectedRegion.Y + _selectedRegion.Height)
@@ -558,7 +558,7 @@ namespace CutterLogical
                 }
                 else if (startPoint.Y < _selectedRegion.Y)
                 {
-                    startPoint.Y = _selectedRegion.Y - 2;
+                    startPoint.Y = _selectedRegion.Y + 2;
                 }
 
                 var endPoint = (Point)_selectedStartPoint;
