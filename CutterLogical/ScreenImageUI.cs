@@ -5,9 +5,11 @@ using System.Drawing.Imaging;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CutterLogical.EventArgsDefinition;
+using CutterLogical.UserControls;
 using Brushes = System.Windows.Media.Brushes;
 using Clipboard = System.Windows.Clipboard;
 using Pen = System.Windows.Media.Pen;
@@ -23,11 +25,14 @@ namespace CutterLogical
         private Bitmap _screenSnapBitmap;
         private MaskingCanvas _maskingCanvas;
         private BitmapSource _bmpSource;
+        private WindowInteropHelper _wndHelper;
 
         public ScreenImageUI(MainCaptureScreen mainCaptureScreen)
         {
             _mainCaptureScreenOwner = mainCaptureScreen;
             Init();
+            Loaded += ScreenImageUI_Loaded;
+            Closing += ScreenImageUI_Closing;
         }
 
         /// <summary>
@@ -62,7 +67,62 @@ namespace CutterLogical
             _maskingCanvas = new MaskingCanvas() {MaskingCanvasOwner = this};
             Grid grid=new Grid();
             grid.Children.Add(_maskingCanvas);
-            Content = grid;
+            Content = grid;        
+        }
+
+        /// <summary>
+        /// 窗体加载完毕执行事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenImageUI_Loaded(object sender, RoutedEventArgs e)
+        {
+            var ctrlHotKey = (uint)(KeyFlags.MOD_NONE);
+            _wndHelper = new WindowInteropHelper(this);
+            if (!HotKey.RegisterHotKey(_wndHelper.Handle, 99, ctrlHotKey, Keys.Escape))
+            {
+                MessageBoxDiy.Show("提示", "热键已被注册，已不能使用!\r\n请点击按钮进行操作!");
+            }
+        }
+
+        private void GlobalKeyProcess()
+        {
+            DialogResult = true;
+            Close();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            var source = PresentationSource.FromVisual(this) as HwndSource;
+            source?.AddHook(WndProc);
+        }
+
+        /// <summary>
+        /// 监视Windows消息
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <param name="msg"></param>
+        /// <param name="wparam"></param>
+        /// <param name="lparam"></param>
+        /// <param name="handled"></param>
+        /// <returns></returns>
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
+        {
+            if (wparam.ToInt32() == 99)
+            {
+                GlobalKeyProcess();
+            }
+            return IntPtr.Zero;
+        }
+
+        /// <summary>
+        /// 窗体关闭时执行的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScreenImageUI_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            HotKey.UnregisterHotKey(_wndHelper.Handle, 99);
         }
 
 

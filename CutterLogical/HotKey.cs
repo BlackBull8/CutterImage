@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Cutter_UI
+namespace CutterLogical
 {
     /// <summary>
     ///     热键

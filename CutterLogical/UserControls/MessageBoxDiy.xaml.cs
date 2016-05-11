@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace Cutter_UI.UserControls
+namespace CutterLogical.UserControls
 {
     /// <summary>
     ///     MessageBoxDiy.xaml 的交互逻辑

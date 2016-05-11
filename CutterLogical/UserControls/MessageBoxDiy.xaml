@@ -1,9 +1,9 @@
-﻿<Window x:Class="Cutter_UI.UserControls.MessageBoxDiy"
+﻿<Window x:Class="CutterLogical.UserControls.MessageBoxDiy"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Cutter_UI.UserControls"
+        xmlns:local="clr-namespace:CutterLogical.UserControls"
         mc:Ignorable="d"
         Title="MessageBoxDiy" Height="130" Width="280" WindowStyle="None" Background="{x:Null}" ResizeMode="NoResize" x:Name="MainWin" AllowsTransparency="True" WindowStartupLocation="CenterScreen">
     <Window.Triggers>
