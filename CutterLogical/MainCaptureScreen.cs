@@ -11,6 +11,7 @@ namespace CutterLogical
             mainCutterUI.Topmost = true;
             if (mainCutterUI.ShowDialog()==true)
             {
+                mainCutterUI = null;
                 NotifyEventHanlder?.Invoke(this, new EventArgs());
             }
         }

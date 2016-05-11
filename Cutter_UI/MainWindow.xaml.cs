@@ -51,7 +51,10 @@ namespace Cutter_UI
         {
             //设置窗口状态
             WindowState = WindowState.Normal;
+            FlushMemory();
         }
+
+        
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
@@ -79,5 +82,20 @@ namespace Cutter_UI
             }
             return IntPtr.Zero;
         }
+
+        #region 强制内存回收
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        public static extern bool SetProcessWorkingSetSize(IntPtr proc, int min, int max);
+        public void FlushMemory()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
+            }
+        }
+        #endregion
+
     }
 }
