@@ -71,15 +71,14 @@ namespace CutterLogical
         /// </summary>
         /// <param name="selectedRegion">截图选中的区域</param>
         /// <param name="listRectangleRects">添加的矩形位置</param>
-        /// <param name="listEllipseTects">添加的椭圆位置</param>
+        /// <param name="listEllipseRects">添加的椭圆位置</param>
         /// <param name="listTextRects">添加的文字位置</param>        
         /// <param name="listArrowLineRects">添加的箭头直线位置</param>
         /// /// <param name="type">类型</param>
-        public void SnapshotClipToBoard(Rect selectedRegion,List<Rect> listRectangleRects,List<Rect> listEllipseTects,List<RectToTextParameter> listTextRects,List<List<double>> listArrowLineRects,int type)
+        public void SnapshotClipToBoard(Rect selectedRegion,List<Rect> listRectangleRects,List<Rect> listEllipseRects,List<RectToTextParameter> listTextRects, List<Arrow> listArrowLineRects,int type)
         {
             if (!selectedRegion.IsEmpty)
             {
-                //var rtbitmap = RenderTargetBitmapMethod(listRectangleRects, listEllipseTects, listTextRects);
                 var rtbitmap = new RenderTargetBitmap(_bmpSource.PixelWidth, _bmpSource.PixelHeight, _bmpSource.DpiX,
                 _bmpSource.DpiY, PixelFormats.Default);
                 Pen pen = new Pen();
@@ -97,7 +96,7 @@ namespace CutterLogical
                         dc.DrawRectangle(new SolidColorBrush(Colors.Transparent), pen, rect);
                     }
                     //输出添加的椭圆
-                    foreach (Rect ellipseTect in listEllipseTects)
+                    foreach (Rect ellipseTect in listEllipseRects)
                     {
                         dc.DrawEllipse(new SolidColorBrush(Colors.Transparent), pen,
                             new Point((ellipseTect.Left + ellipseTect.Right) / 2, (ellipseTect.Top + ellipseTect.Bottom) / 2),
@@ -115,17 +114,9 @@ namespace CutterLogical
                         dc.DrawText(text, new Point(rectToTextParameter.Rect.X, rectToTextParameter.Rect.Y));
                     }
                     //输出添加的箭头直线
-                    foreach (List<double> points in listArrowLineRects)
+                    foreach (Arrow arrow in listArrowLineRects)
                     {
-                        Console.WriteLine(points[0]+":"+points[1]+":"+points[2]+":"+points[3]);
-                        Arrow arrow=new Arrow();
-                        arrow.HeadWidth = 15;
-                        arrow.HeadHeight = 5;
-                        arrow.X1 = points[0];
-                        arrow.Y1 = points[1];
-                        arrow.X2 = points[2];
-                        arrow.Y2 = points[3];
-                        dc.DrawGeometry(new SolidColorBrush(Colors.Red),new Pen(Brushes.Red ,3), arrow.ArrowLineGeometry);
+                        dc.DrawGeometry(new SolidColorBrush(Colors.Transparent),new Pen(Brushes.Red ,3), arrow.ArrowLineGeometry);
                     }
                 }
                 //调用RenderTargetBitmap的Render方法，并传入刚才创建的drawingVisual对象

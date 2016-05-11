@@ -73,8 +73,7 @@ namespace CutterLogical
 
         //添加箭头线所需要的字段
         private Arrow _arrow;
-        private readonly List<List<double>> _listArrowLineRects = new List<List<double>>();
-        private readonly List<Arrow> _listArrowLines=new List<Arrow>();
+        private readonly List<Arrow> _listArrowLines = new List<Arrow>();
 
         //添加文字所需要的字段
         private TextBox _drawTextBox;
@@ -119,7 +118,7 @@ namespace CutterLogical
             //将生成的操作窗体放入到MaskingCanvas窗体中
             if (_operationWindow == null)
             {
-                _operationWindow = new PopupControl {Width = 190, Height = 30};
+                _operationWindow = new PopupControl { Width = 190, Height = 30 };
                 _operationWindow.Visibility = Visibility.Collapsed;
                 _operationWindow.StartOperationEvent += _operationWindow_StartOperationEvent;
                 _operationWindow.CancelOperationEvent += _operationWindow_CancelOperationEvent;
@@ -157,7 +156,7 @@ namespace CutterLogical
                     listTextRects.Add(rectToTextParameter);
                 }
                 MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
-               listTextRects,_listArrowLineRects,2);
+               listTextRects, _listArrowLines, 2);
             }
         }
 
@@ -253,7 +252,7 @@ namespace CutterLogical
         #region 鼠标左键按下事件
 
         /// <summary>
-        ///     鼠标左键按下事件
+        /// 鼠标左键按下事件
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -274,7 +273,7 @@ namespace CutterLogical
                 if (!IsMouseCaptured)
                 {
                     CaptureMouse();
-                }         
+                }
                 _catchStart = true;
                 if (_operationWindow.Visibility == Visibility.Visible)
                 {
@@ -286,7 +285,7 @@ namespace CutterLogical
             {
                 if (e.ClickCount >= 2)
                 {
-                    //todo:进行截图
+                    //双击截图
                     if (MaskingCanvasOwner != null)
                     {
                         FinishWork();
@@ -303,14 +302,22 @@ namespace CutterLogical
                     else
                     {
                         _isDraw = true;
+                        //矩形工具操作
                         if (_operation == "Rectangle")
                         {
                             DrawRectangle();
                         }
+                        //椭圆工具操作
                         else if (_operation == "Ellipse")
                         {
                             DrawEllipse();
                         }
+                        //箭头工具操作
+                        else if (_operation == "ArrowLine")
+                        {
+                            DrawArrowLine();
+                        }
+                        //文字工具操作
                         else if (_operation == "Text")
                         {
                             if (!_flag)
@@ -323,10 +330,6 @@ namespace CutterLogical
                                 _textBoxAndTextDict.Keys.Last().MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
                                 _flag = false;
                             }
-                        }
-                        else if (_operation == "ArrowLine")
-                        {
-                            DrawArrowLine();
                         }
                     }
                     if (!IsMouseCaptured)
@@ -343,18 +346,17 @@ namespace CutterLogical
         /// </summary>
         private void DrawArrowLine()
         {
-            _arrow=new Arrow();
-            _arrow.X1 = _arrow.X2=((Point) _selectedStartPoint).X;
-            _arrow.Y1 = _arrow.Y2=((Point)_selectedStartPoint).Y;
+            _arrow = new Arrow();
+            _arrow.X1 = _arrow.X2 = ((Point)_selectedStartPoint).X;
+            _arrow.Y1 = _arrow.Y2 = ((Point)_selectedStartPoint).Y;
             _arrow.HeadWidth = 15;
             _arrow.HeadHeight = 5;
             _arrow.Stroke = Brushes.Red;
             _arrow.StrokeThickness = 3;
-            _arrow.Visibility=Visibility.Collapsed;
+            _arrow.Visibility = Visibility.Collapsed;
             Children.Add(_arrow);
-            _listArrowLines.Add(_arrow);
         }
-      
+
         /// <summary>
         /// 选择椭圆工具时的操作
         /// </summary>
@@ -437,7 +439,7 @@ namespace CutterLogical
         /// <param name="e"></param>
         private void _drawTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            var textBox = sender as TextBox;          
+            var textBox = sender as TextBox;
             if (_selectedStartPoint.HasValue && textBox != null)
             {
                 if (textBox.Text.Trim() == "")
@@ -455,7 +457,7 @@ namespace CutterLogical
                     _drawRect.Height = textBox.ActualHeight;
                     var rectToTextParameter = _textBoxAndTextDict[textBox];
                     rectToTextParameter.Rect = _drawRect;
-                    rectToTextParameter.Text = textBox.Text;                    
+                    rectToTextParameter.Text = textBox.Text;
                 }
                 _drawRect = Rect.Empty;
             }
@@ -474,10 +476,10 @@ namespace CutterLogical
                 listTextRects.Add(rectToTextParameter);
             }
             MaskingCanvasOwner.SnapshotClipToBoard(_selectedRegion, _listRects, _listRectEllipses,
-                listTextRects, _listArrowLineRects,1);
+                listTextRects, _listArrowLines, 1);
         }
 
-       
+
         //判断鼠标是否点在定义的四个矩形上面
         private bool IsMouseOnThis(RoutedEventArgs e)
         {
@@ -540,7 +542,7 @@ namespace CutterLogical
             if (_selectedStartPoint.HasValue)
             {
                 _selectedEndPoint = e.GetPosition(this);
-                var startPoint = (Point) _selectedEndPoint;
+                var startPoint = (Point)_selectedEndPoint;
                 if (startPoint.X > _selectedRegion.X + _selectedRegion.Width)
                 {
                     startPoint.X = _selectedRegion.X + _selectedRegion.Width - 2;
@@ -559,7 +561,7 @@ namespace CutterLogical
                     startPoint.Y = _selectedRegion.Y - 2;
                 }
 
-                var endPoint = (Point) _selectedStartPoint;
+                var endPoint = (Point)_selectedStartPoint;
 
                 var startX = startPoint.X;
                 var startY = startPoint.Y;
@@ -596,8 +598,8 @@ namespace CutterLogical
                         {
                             _arrow.Visibility = Visibility.Visible;
                         }
-                        double originalX = ((Point) _selectedEndPoint).X;
-                        double originalY = ((Point) _selectedEndPoint).Y;
+                        double originalX = ((Point)_selectedEndPoint).X;
+                        double originalY = ((Point)_selectedEndPoint).Y;
 
                         if (originalX > _selectedRegion.Right)
                         {
@@ -617,14 +619,14 @@ namespace CutterLogical
                             originalY = _selectedRegion.Top;
                         }
                         _arrow.X2 = originalX;
-                        _arrow.Y2 = originalY;                        
+                        _arrow.Y2 = originalY;
                     }
                 }
             }
         }
 
         /// <summary>
-        ///     移动——更新选择区域
+        /// 移动——更新选择区域
         /// </summary>
         /// <param name="e"></param>
         private void MoveSelectedRegion(MouseEventArgs e)
@@ -632,8 +634,8 @@ namespace CutterLogical
             if (_selectedStartPoint.HasValue)
             {
                 _selectedEndPoint = e.GetPosition(this);
-                var startPoint = (Point) _selectedStartPoint;
-                var endPoint = (Point) _selectedEndPoint;
+                var startPoint = (Point)_selectedStartPoint;
+                var endPoint = (Point)_selectedEndPoint;
 
                 var disX = endPoint.X - startPoint.X;
                 var disY = endPoint.Y - startPoint.Y;
@@ -649,7 +651,7 @@ namespace CutterLogical
         }
 
         /// <summary>
-        ///     刚开始拉伸——更新选择区域
+        /// 刚开始拉伸——更新选择区域
         /// </summary>
         /// <param name="e"></param>
         private void UpdateSelectedRegion(MouseEventArgs e)
@@ -658,8 +660,8 @@ namespace CutterLogical
             {
                 _selectedEndPoint = e.GetPosition(this);
 
-                var startPoint = (Point) _selectedEndPoint;
-                var endPoint = (Point) _selectedStartPoint;
+                var startPoint = (Point)_selectedEndPoint;
+                var endPoint = (Point)_selectedStartPoint;
 
                 var startX = startPoint.X;
                 var startY = startPoint.Y;
@@ -732,7 +734,6 @@ namespace CutterLogical
                     if (!_drawRect.IsEmpty)
                     {
                         _listRects.Add(_drawRect);
-                        _drawRect = Rect.Empty;
                     }
                 }
                 else if (_operation == "Ellipse")
@@ -740,16 +741,16 @@ namespace CutterLogical
                     if (!_drawRect.IsEmpty)
                     {
                         _listRectEllipses.Add(_drawRect);
-                        _drawRect = Rect.Empty;
                     }
                 }
                 else if (_operation == "ArrowLine")
                 {
                     if (!_drawRect.IsEmpty)
                     {
-                        _listArrowLineRects.Add(new List<double>() {_arrow.X1,_arrow.Y1,_arrow.X2,_arrow.Y2 });
+                        _listArrowLines.Add(_arrow);                       
                     }
                 }
+                _drawRect = Rect.Empty;
                 _isDraw = false;
             }
             base.OnMouseLeftButtonUp(e);
@@ -766,16 +767,16 @@ namespace CutterLogical
             }
             if (_catchFinished)
             {
-                //给选择框添加一个Adorner用来拉伸
-                var myCanvasAdorner = new MyCanvasAdorner(_selectingRectangle);
-                myCanvasAdorner.HoriEventHandler += MyCanvasAdorner_HoriEventHandler;
-                myCanvasAdorner.VerticEventHandler += MyCanvasAdorner_VerticEventHandler;
-                var layer = AdornerLayer.GetAdornerLayer(this);
-                layer.Add(myCanvasAdorner);
-                //操作窗体的显示位置
-                _operationWindow.Visibility = Visibility.Visible;
                 if (!_selectedRegion.IsEmpty)
                 {
+                    //给选择框添加一个Adorner用来拉伸
+                    var myCanvasAdorner = new MyCanvasAdorner(_selectingRectangle);
+                    myCanvasAdorner.HoriEventHandler += MyCanvasAdorner_HoriEventHandler;
+                    myCanvasAdorner.VerticEventHandler += MyCanvasAdorner_VerticEventHandler;
+                    var layer = AdornerLayer.GetAdornerLayer(this);
+                    layer.Add(myCanvasAdorner);
+                    //操作窗体的显示位置
+                    _operationWindow.Visibility = Visibility.Visible;
                     SetTop(_operationWindow, _selectedRegion.Bottom);
                     SetLeft(_operationWindow, _selectedRegion.Right - _operationWindow.Width);
                 }
@@ -857,7 +858,6 @@ namespace CutterLogical
                 Children.Remove(arrow);
             }
             _listArrowLines.Clear();
-            _listArrowLineRects.Clear();
             _operationWindow.DrawEllipseTbn.IsChecked =
                 _operationWindow.DrawRectangleTbn.IsChecked = _operationWindow.DrawTextTbn.IsChecked = false;
             _operation = "";

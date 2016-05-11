@@ -8,7 +8,7 @@ namespace CutterLogical
 {
     public sealed class Arrow:Shape
     {
-        #region Dependency Properties
+        #region 依赖属性
         public static readonly DependencyProperty X1Property = DependencyProperty.Register("X1", typeof(double), typeof(Arrow), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure));
         public static readonly DependencyProperty Y1Property = DependencyProperty.Register("Y1", typeof(double), typeof(Arrow), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure));
         public static readonly DependencyProperty X2Property = DependencyProperty.Register("X2", typeof(double), typeof(Arrow), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure));
@@ -18,7 +18,7 @@ namespace CutterLogical
         #endregion
 
 
-        #region CLR Properties
+        #region CLR属性
         [TypeConverter(typeof(LengthConverter))]
         public double X1
         {
@@ -58,24 +58,26 @@ namespace CutterLogical
         #endregion
 
 
-        #region Overrides
+        #region 重写Shape父类的属性
         protected override Geometry DefiningGeometry
         {
             get
             {
-                // Create a StreamGeometry for describing the shape
+                //创建一个StreamGeometry来描述Shape
                 StreamGeometry geometry = new StreamGeometry();
                 geometry.FillRule = FillRule.EvenOdd;
                 using (StreamGeometryContext context = geometry.Open())
                 {
                     InternalDrawArrowGeometry(context);
                 }
-                // Freeze the geometry for performance benefits
                 geometry.Freeze();
                 return geometry;
             }
         }
+        #endregion
 
+
+        #region 对外暴露Shape的DefiningGeometry属性
         public Geometry ArrowLineGeometry
         {
             get { return DefiningGeometry; }
@@ -84,7 +86,11 @@ namespace CutterLogical
         #endregion
 
 
-        #region Privates
+        #region 私有方法
+        /// <summary>
+        /// 制作箭头线
+        /// </summary>
+        /// <param name="context"></param>
         private void InternalDrawArrowGeometry(StreamGeometryContext context)
         {
             double theta = Math.Atan2(Y1 - Y2, X1 - X2);
